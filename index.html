@@ -36,21 +36,32 @@
 	<link rel="stylesheet" href="timeCircles/timeCircles.css" />
 </head>
 
-<body onload="init()" style="width: 300px; height: 200px">
+<body style="width: 300px; height: 200px">
 	<br/>
 	<div align="center">
-				<input id="startStop" value="Random" type="button" onClick="startStop()" style="width: 80px;"/>
+		<input id="startStop" value="Random" type="button" onClick="startStop()" style="width: 80px;"/>
 			
 		<div id="config">
-			<div id="seriesCount">
-				Series #:
-				<input type="radio" id="series2" name="seriesCount" checked="series2"><label for="2">2</label>
-				<input type="radio" id="series3" name="seriesCount" checked="series3"><label for="3">3</label>
-				<input type="radio" id="series4" name="seriesCount" checked="series3"><label for="4">4</label>
-				<input type="radio" id="series5" name="seriesCount" checked="series3"><label for="5">5</label>
-				<input type="radio" id="series6" name="seriesCount" checked="series3"><label for="6">6</label>
-			</div>
+				<div id="series" class="group">
+						<div class="title">Series#</div>
+						<input type="radio" id="series2" name="seriesrb" checked="series2"><label for="series2">2</label>
+						<input type="radio" id="series3" name="seriesrb" checked="series3"><label for="series3">3</label>
+						<input type="radio" id="series4" name="seriesrb" checked="series4"><label for="series4">4</label>
+						<input type="radio" id="series5" name="seriesrb" checked="series5"><label for="series5">5</label>
+					</div>
 			
+					<div id="reps" class="group">
+							<div class="title">Reps/sets</div>
+							<input type="radio" id="reps5" name="repsrb" checked="reps5"><label for="reps5">5/4</label>
+							<input type="radio" id="resp10" name="repsrb" checked="resp10"><label for="resp10">10/2</label>
+							<input type="radio" id="repsalt" name="repsrb" checked="repsalt"><label for="repsalt">Alternate</label>
+					</div>
+
+					<div id="swtype" class="group">
+							<div class="title">Swing type</div>
+							<input type="radio" id="sw2" name="swtyperb" checked="sw2"><label for="sw2">Two-arm</label>
+							<input type="radio" id="sw1" name="swtyperb" checked="sw1"><label for="sw1">One-arm</label>
+					</div>
 			<br/>
 
 		    <table>
