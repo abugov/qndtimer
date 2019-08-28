@@ -1,0 +1,139 @@
+﻿<!doctype html>
+<html manifest="main.appcache">
+<head>
+	<!-- Mobile installtohomescreen -->
+    <title>Av Timer</title>
+    <meta name="application-name" content="Av Timer">
+    <meta name="apple-mobile-web-app-title" content="Av Timer">
+    <meta name="viewport" content="width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- for ios 7 style -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon152.png">
+    <!-- for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="shortcut icon" sizes="192x192" href="icon192.png">
+
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<link rel="manifest" href="manifest.json">
+    <link rel="icon" sizes="192x192" href="icon192.png">
+	<link rel="icon" sizes="128x128" href="icon128.png">
+	 
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+	<script type="text/javascript" src="timeCircles/timeCircles.min.js"></script>
+    <script type="text/javascript" src="jplayer/jquery.jplayer.min.js"></script>
+	<script type="text/javascript" src="total-storage/jquery.total-storage.min.js"></script>
+	
+	<script type="text/javascript" src="myStorage.js"></script>
+	<script type="text/javascript" src="main2.js"></script>
+
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="main.css" />
+	<link rel="stylesheet" href="timeCircles/timeCircles.css" />
+</head>
+
+<body onload="init()" style="width: 300px; height: 200px">
+	<br/>
+	<div align="center">
+				<input id="startStop" value="Random" type="button" onClick="startStop()" style="width: 80px;"/>
+			
+		<div id="config">
+			<div id="seriesCount">
+				Series #:
+				<input type="radio" id="series2" name="seriesCount" checked="series2"><label for="2">2</label>
+				<input type="radio" id="series3" name="seriesCount" checked="series3"><label for="3">3</label>
+				<input type="radio" id="series4" name="seriesCount" checked="series3"><label for="4">4</label>
+				<input type="radio" id="series5" name="seriesCount" checked="series3"><label for="5">5</label>
+				<input type="radio" id="series6" name="seriesCount" checked="series3"><label for="6">6</label>
+			</div>
+			
+			<br/>
+
+		    <table>
+		        <tr>
+		            <td style="width: 70px">
+		            Inhale:
+		            <td style="width: 50px">
+		                <input id="inhale" type="number" pattern="[0-9]*" value="7" min="1" style="width: 30px"/>
+		            </td>
+		        </tr>
+		        <tr>
+		            <td>
+		                Hold:
+		            </td>
+		            <td>
+		                <label id="hold"></label>
+		            </td>
+		        </tr>
+		        <tr>
+		            <td>
+		                Exhale:
+		            </td>
+		            <td>
+		                <label id="exhale"></label>
+		            </td>
+		        </tr>
+		    </table>
+
+		    <br/>
+
+            <table style="font-size: large">
+                <tr>
+                    <td style="width: 50px; text-align: center">
+                        <input id="time" type="number" pattern="[0-9]*" value="15" min="1" style="width: 50px; text-align: center" />
+                        <label id="timeDisplay" style="display: none"></label>
+                    </td>
+                    <td style="text-align: center">
+                        minutes
+                    </td>
+                </tr>
+            </table>
+
+		</div>
+
+	    <br/>
+	
+		<table>
+			<tr>
+				<td><input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 60px;"/></td>
+				<td><div id="clock" style="width: 100px; height: 100px;"></div></td>
+			</tr>
+		</table>
+
+        <table>
+            <tr>
+                <td>Cycles: <label id="cycles">0</label></td>
+                <td><img id="directionImage" style="display: none" /></td>
+            </tr>
+        </table>
+		
+		<br/>
+		
+		<div id="keepUnlockedMessage" style="display: none">
+			<p style="font-size:12px">
+				<label>IMPORTANT: Keep the device UNLOCKED</label>
+				<br/>
+				<label style="font-size:10px">(otherwise the timer will stop after a few minutes)</label>
+			</p>
+		</div>
+	</div>
+
+    <div id="jplayerGong"></div>
+    <div id="jplayerGong3"></div>
+    <div id="jplayerTicks3"></div>
+    <div id="jplayerMetronome"></div>
+
+    <video id="dummyVideo" volume="0" width="0" loop>
+	  <source src="video/DummyMovie.mp4" type="video/mp4">
+	</video>
+
+    <input id="testBtn" value="Test" type="button" onclick="test()" style="display: none"/>
+
+    <div class="version"><label>ver:</label><label id="documentVersion"></label></div>
+</body>
+</html>
+
