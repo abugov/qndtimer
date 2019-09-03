@@ -18,17 +18,19 @@ const puf = "fists";
 function init() {
 	// global vars
 	trainingSession = [];
+	sessionStartTime = new Date();
+	setEndTime = new Date();
     timers = [];
     sounds = [];
 	holdMultiply = 1;
 	exhaleMultiply = 1;
 	ticksDuration = 3000; // The ticks3Sound must have this exact duration:
+	debugMode = window.location.search.indexOf('debug') > -1;
 
 	getDummyVideoElement().volume = 0;
 	
     // Sounds
 	gongSound = createJPlayer("#jplayerGong", "audio/gong.ogg", false);
-	gong3Sound = createJPlayer("#jplayerGong3", "audio/gong3.ogg", false);
 	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
 
 	// input elements
@@ -51,7 +53,12 @@ function init() {
 	pupElement=$("#pup");
 	pufElement=$("#puf");
 	
+	elapsedElement = $("#elapsed");
+	totalTimeElement = $("#totalTime");
+	currentSeriesElement = $("#currentSeries");
 	timeElement = $("#time");
+	currentSetElement = $("#currentSet");
+	nextSetElement = $("#nextSet");
 	testBtnElement = $("#testBtn");
     documentVersionElement = $("#documentVersion");
 
@@ -203,55 +210,6 @@ function setPushupType(dice) {
 		pufElement.prop("checked", true);
 }
 
-function startStop() {
-    if (startStopElement.val() == "Start")
-        start();
-    else
-        stop();
-}
-
-function start() {
-    startStopElement.val('Reset');
-    timeElement.hide()
-    timeDisplayElement.show();
-
-    showKeepUnlockedMessage();
-
-    // if inhale value is invalid - change to 1
-    if ($.isNumeric(inhaleElement.val()) == false || inhaleElement.val() < 1) {
-        inhaleElement.val(1);
-        configChanged();
-    }
-
-    inhaleDuration = inhaleElement.val() * 1000;
-
-    configInputElements.attr("disabled", true); // disable inputs
-
-    durationMinutes = timeElement.val();
-    endTime = new Date(new Date().getTime() + (durationMinutes * 60 * 1000));
-
-    touchUserElements();
-
-    mySetTimeout(function () { doWork('prepare'); }, 0);
-    mySetTimeout(function () { runClockAndPreventDisplayTurnOff(); }, 0);
-}
-
-function stop() {
-    startStopElement.val('Start');
-    getDummyVideoElement().pause();
-    hideKeepUnlockedMessage();
-    timeElement.show()
-    timeDisplayElement.hide();
-
-    timers.forEach(function (timer) { clearTimeout(timer); });
-    timers = [];
-
-    sounds.forEach(function (sound) { sound.jPlayer("stop"); });
-
-    configInputElements.attr("disabled", false);
-    setSecondsText('finished');
-}
-
 // This method is part of a user-event callstack (the user clicks the "Start button")
 // We "touch" all user elements so the smartphone browser will allow manipulating them latter from background thread
 // Workaround for mobile: http://stackoverflow.com/questions/14970204/android-not-playing-html5-audio-from-an-interval
@@ -332,9 +290,14 @@ function configChanged() {
 		return;
 	}
 
+	var totalTimeMins = getSeries() * 3 /*min*/ * 2 /*swings+pushups*/;
+	setTotalTimeText(totalTimeMins + ":00");
+
+	setCurrentSeriesText("");
+	setCurrentSetText("");
+	setNextSetText("");
+
 	var series = getSeries();
-	var repsCount = series * 20;
-	var sessionMin = series * 3 /*min*/ * 2 /*swings+pushups*/
 
 	trainingSession = getSwingsSeries(series);
 	trainingSession = trainingSession.concat(getPushupsSeries(series));
@@ -342,8 +305,8 @@ function configChanged() {
 	debug("=== training session: ===");
 
 	for (i = 0; i < trainingSession.length; i++) {
-		c = trainingSession[i];
-		debug("series " + c.series + ": " + c.name + " " + c.time + " sec");
+		set = trainingSession[i];
+		debug("series " + set.series + ": " + set.name + " " + set.time + " sec");
 	}
 }
 
@@ -436,6 +399,7 @@ function getPushupsSeries(series) {
 }
 
 function test() {
+	gongSound.jPlayer("stop");
     gongSound.jPlayer("play");
 }
 
@@ -452,78 +416,118 @@ function mySetTimeout(func, duration) {
 	timers.push(timer);
 }
 
-function setSecondsText(text) {
-	timerElement.val = text
+function setTimerText(text) {
+	timerElement.text(text)
 }
 
-function doWork(state) {
-	setSecondsText(state);
-    
-    var gong = true;
-	var duration;	
-	var nextState;
-  
-    // Calc state duration and get the next state
-	if (state === 'prepare') {
-	    duration = 5000;
-	    nextState = 'inhale';
-	    gong = false;
-	}
-	else if (state === 'inhale') {	
-		duration = inhaleDuration;
-		nextState = 'hold';
-	}
-	else if (state === 'hold') {
-		duration = inhaleDuration * holdMultiply;
-		nextState = 'exhale';
-	}	
-	else if (state === 'exhale') {
-		duration = inhaleDuration * exhaleMultiply;
-		nextState = 'inhale';
-	}
+function setElapsedText(text) {
+	elapsedElement.text(text)
+}
 
-	isLastExhale = state === 'exhale' && getTimeLeftMilli() <= duration;
+function setCurrentSetText(text) {
+	currentSetElement.text(text)
+}
 
-	if (gong) {
-        // play 1 gong or 3 gongs at the end of the last cycle
-	    if (isLastExhale) {
-	        gong3Sound.jPlayer("stop");
-	        gong3Sound.jPlayer("play");
-	    }
-	    else {
-	        gongSound.jPlayer("stop");
-	        gongSound.jPlayer("play");
-	    }
-	}
+function setNextSetText(text) {
+	nextSetElement.text(text)
+}
 
-    restartClock(duration);
+function setTotalTimeText(text) {
+	totalTimeElement.text(text)
+}
+
+function setCurrentSeriesText(text) {
+	currentSeriesElement.text(text)
+}
+
+function startStop() {
+    if (startStopElement.val() == "Start")
+        start();
+    else
+        stop();
+}
+
+function start() {
+    startStopElement.val('Reset');
+
+    showKeepUnlockedMessage();
+
+    configInputElements.attr("disabled", true); // disable inputs
+
+	touchUserElements();
+
+	sessionStartTime = new Date();
+
+    mySetTimeout(function () { startSet(0); }, 0);
+    mySetTimeout(function () { runClockAndPreventDisplayTurnOff(); }, 0);
+}
+
+function stop() {
+    startStopElement.val('Start');
+    getDummyVideoElement().pause();
+    hideKeepUnlockedMessage();
+
+    timers.forEach(function (timer) { clearTimeout(timer); });
+    timers = [];
+
+    sounds.forEach(function (sound) { sound.jPlayer("stop"); });
+
+    configInputElements.attr("disabled", false);
+	setTimerText('0');
+	setElapsedText('00:00');
+	setTotalTimeText('00:00');
+	setCurrentSeriesText("");
+	setCurrentSetText("");
+	setNextSetText("");
+}
+
+function startSet(index) {
+	var set = trainingSession[index];
+
+	var duration = set.time * 1000;
+	setEndTime = new Date(new Date().getTime() + duration);
+	var endTime = pad(setEndTime.getHours()) + ":" + pad(setEndTime.getMinutes()) + ":" + pad(setEndTime.getSeconds());
+
+	debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec, end: " + endTime);
+
+	gongSound.jPlayer("stop");
+	gongSound.jPlayer("play");
+
+	setCurrentSeriesText(set.type + " series " + set.series + " of " + getSeries());
+	setCurrentSetText(set.name);
+
+	if (index == trainingSession.length - 1)
+		setNextSetText("Done!");
+	else
+		setNextSetText(trainingSession[index+1].name);
+
+	// reset timer
+	setTimerText(set.time)
 	
 	// play 3 ticks towards the end of the phase
 	var ticksStart = duration - ticksDuration;
 	mySetTimeout(function(){ play3Ticks(); }, ticksStart); 
 	
 	// Start the next interval or stop if time ended
-	mySetTimeout(function(){ 
+	mySetTimeout(function(){
+		++index;
+
         // stop if this is the end of a full cycle (just switched to 'right' for the next cycle) and only 30 seconds or less left
-	    if (state === 'exhale' && getTimeLeftMilli() <= 30000)
+	    if (index == trainingSession.length)
 	        stop();
         else
-	        doWork(nextState); 
+			startSet(index); 
 	}, duration);
 }
 
 function runClockAndPreventDisplayTurnOff() {
-    // update time display
-    var timeLeftMilli = getTimeLeftMilli();
-    var timeLeftMinutes = 0;
-    var timeLeftSeconds = 0;
+	var timeLeft = setEndTime - new Date();
+	setTimerText(Math.ceil(timeLeft / 1000));
 
-    if (timeLeftMilli >= 0) {
-        var timeLeftMinutes = Math.floor((timeLeftMilli % 36e5) / 6e4);
-        var timeLeftSeconds = Math.floor((timeLeftMilli % 6e4) / 1000);
-    }
-
-    timeDisplayElement.text(pad(timeLeftMinutes) + ":" + pad(timeLeftSeconds));
+	var elapsed = new Date() - sessionStartTime;
+	var minutes = Math.floor(elapsed / 60000);
+  	var seconds = ((elapsed % 60000) / 1000).toFixed(0);
+	setElapsedText(pad(minutes) + ":" + pad(seconds))
 
     getDummyVideoElement().play();
     getDummyVideoElement().pause();
@@ -537,16 +541,8 @@ function pad(number) {
     return (number < 10) ? '0' + number.toString() : number.toString();
 }
 
-function getTimeLeftMilli() {
-    return endTime - new Date().getTime();
-}
-
 function play3Ticks() {
     ticks3Sound.jPlayer("play");
-}
-
-function restartClock(durationMilli) {
-	setSecondsText(durationMilli / 1000)
 }
 
 function rollDice() {
@@ -556,5 +552,6 @@ function rollDice() {
 }
 
 function debug(msg) {
-	console.log(msg)
+	if (debugMode)
+		console.log(msg)
 }

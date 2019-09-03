@@ -87,19 +87,15 @@
 				</table>
 		</div>
 		<input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 80px;"/>
-		01:32 / 12:00 (elapsed)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Swings series 1 of 2<br/>
+		<label id="elapsed">00:00</label> / <label id="totalTime">00:00</label> (elapsed)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label id="currentSeries">Swings series 1 of 2</label><br/>
 		<label class="plan">
 			<br/>
 			<label class="big">
-				Now: <label class="now">Swings 5L</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next: Rest<br/>
+				Now: <label id="currentSet" class="now">Swings 5L</label>&nbsp;&nbsp;&nbsp;<label id="timer" class="timer">0</label> sec<br/>
+				Next: <label id="nextSet">Rest</label><br/>
 			</label>
 		</label>
-		<br/>
 
-
-
-		<label id="timer" class="timer">00</label> sec
-	
 		<br/>
 		<div id="keepUnlockedMessage" style="display: none">
 			<p style="font-size:12px">
