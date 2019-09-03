@@ -67,7 +67,7 @@ label {
   line-height: 2;
   cursor: pointer;
 }
-label:before {
+.radiolbl:before {
   box-sizing: border-box;
   content: " ";
   position: absolute;

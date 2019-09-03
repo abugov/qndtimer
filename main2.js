@@ -16,12 +16,21 @@ function init() {
 	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
 	metronomeSound = createJPlayer("#jplayerMetronome", "audio/metronome.ogg", true);
 
-	// Exercise radio buttons
+	// input elements
 	series2Element=$("#series2");
 	series3Element=$("#series3");
 	series4Element=$("#series4");
 	series5Element=$("#series5");
-	series6Element=$("#series6");
+
+	reps5Element=$("#reps5");
+	reps10Element=$("#reps10");
+	repsaltElement=$("#repsalt");
+
+	sw2Element=$("#sw2");
+	sw1Element=$("#sw1");
+
+	pupElement=$("#pup");
+	pufElement=$("#puf");
 	
 	inhaleElement=$("#inhale");
 	holdElement=$("#hold");
@@ -45,25 +54,10 @@ function init() {
 	series3Element.click(refreshExerciseTimes);
 	series4Element.click(refreshExerciseTimes);
 	series5Element.click(refreshExerciseTimes);
-	series6Element.click(refreshExerciseTimes);
 	inhaleElement.keyup(refreshExerciseTimes);
-	
-	inhaleElement.on("click", function () { $(this).select(); });
-	timeElement.on("click", function () { $(this).select(); });
 
 	loadFromStorage();
 	refreshExerciseTimes();
-
-	var body = document.documentElement;
-	if (body.requestFullscreen) {
-	    body.requestFullscreen();
-	} else if (body.webkitrequestFullscreen) {
-	    body.webkitrequestFullscreen();
-	} else if (body.mozrequestFullscreen) {
-	    body.mozrequestFullscreen();
-	} else if (body.msrequestFullscreen) {
-	    body.msrequestFullscreen();
-	}
 
 	window.addEventListener("load", function () { window.scrollTo(0, 0); });
 	document.addEventListener("touchmove", function (e) { e.preventDefault() });
@@ -71,7 +65,20 @@ function init() {
 	if (isTestMode())
 	    testBtnElement.show();
 
-	documentVersionElement.text(document.lastModified);
+	documentVersionElement.text(version());
+}
+
+function version() {
+	d = new Date(document.lastModified)
+	major = d.getUTCFullYear() - 2019
+	minor = d.getUTCMonth() + 1
+	build = d.getUTCDate()
+	rev = d.getUTCHours() * 100 + d.getUTCMinutes()
+	return major + "." + minor + "." + build + "." + rev
+}
+
+function rand() {
+	d = dice()
 }
 
 function startStop() {
@@ -170,23 +177,31 @@ function getDummyVideoElement() {
 }
 
 function loadFromStorage() {
-    loadInput(inhaleElement);
-    loadInput(timeElement);
 	loadRadio(series2Element);
 	loadRadio(series3Element);
 	loadRadio(series4Element);
 	loadRadio(series5Element);
-	loadRadio(series6Element);
+	loadRadio(reps5Element);
+	loadRadio(reps10Element);
+	loadRadio(repsaltElement);
+	loadRadio(sw2Element);
+	loadRadio(sw1Element);
+	loadRadio(pupElement);
+	loadRadio(pufElement);
 }
 
 function saveToStorage() {
-    saveInput(inhaleElement);
-    saveInput(timeElement);
 	saveRadio(series2Element);
 	saveRadio(series3Element);
 	saveRadio(series4Element);
 	saveRadio(series5Element);
-	saveRadio(series6Element);
+	saveRadio(reps5Element);
+	saveRadio(reps10Element);
+	saveRadio(repsaltElement);
+	saveRadio(sw2Element);
+	saveRadio(sw1Element);
+	saveRadio(pupElement);
+	saveRadio(pufElement);
 }
 
 function refreshExerciseTimes() {
@@ -381,4 +396,8 @@ function play3Ticks() {
 function restartClock(durationMilli) {
 	clockElement.data('timer', durationMilli / 1000);
 	clockCircle.restart();
+}
+
+function dice() {
+	return Math.floor((Math.random() * 6) + 1);
 }
