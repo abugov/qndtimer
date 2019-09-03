@@ -25,7 +25,6 @@
 	 
     <script type="text/javascript" src="jquery.min.js"></script>
 
-	<script type="text/javascript" src="timeCircles/timeCircles.min.js"></script>
     <script type="text/javascript" src="jplayer/jquery.jplayer.min.js"></script>
 	<script type="text/javascript" src="total-storage/jquery.total-storage.min.js"></script>
 	
@@ -34,13 +33,12 @@
 
 	<link rel="stylesheet" href="bootstrap.min.css">
 	<link rel="stylesheet" href="main.css" />
-	<link rel="stylesheet" href="timeCircles/timeCircles.css" />
 </head>
 
 <body onload="init()" style="width: 300px; height: 200px;">
 	<br/>
 	<div align="center">
-		<input id="rand" value="Random1" type="button" onClick="rand()" style="width: 80px;"/>
+		<input id="rand" value="Random" type="button" onClick="rand()" style="width: 80px;"/>
 			
 		<div id="config">
 				<table style="width: 500px">
@@ -48,43 +46,46 @@
 								<td style="width: 15%">
 										Series#
 								<td>
-										<input type="radio" id="series2" name="seriesrb" checked="series2"><label class="radiolbl" for="series2">2</label>
-										<input type="radio" id="series3" name="seriesrb" checked="series3"><label class="radiolbl" for="series3">3</label>
-										<input type="radio" id="series4" name="seriesrb" checked="series4"><label class="radiolbl" for="series4">4</label>
-										<input type="radio" id="series5" name="seriesrb" checked="series5"><label class="radiolbl" for="series5">5</label>
+										<input type="radio" id="series2" name="seriesrb"><label class="radiolbl" for="series2">2</label>
+										<input type="radio" id="series3" name="seriesrb"><label class="radiolbl" for="series3">3</label>
+										<input type="radio" id="series4" name="seriesrb"><label class="radiolbl" for="series4">4</label>
+										<input type="radio" id="series5" name="seriesrb"><label class="radiolbl" for="series5">5</label>
 								</td>
 						</tr>
 						<tr>
 								<td style="width: 15%">
 										Reps/sets
 								<td>
-										<input type="radio" id="reps5" name="repsrb" checked="reps5"><label class="radiolbl" for="reps5">5/4</label>
-										<input type="radio" id="reps10" name="repsrb" checked="reps10"><label class="radiolbl" for="reps10">10/2</label>
-										<input type="radio" id="repsalt" name="repsrb" checked="repsalt"><label class="radiolbl" for="repsalt">Alternate</label>
+										<input type="radio" id="reps5" name="repsrb"><label class="radiolbl" for="reps5">5/4</label>
+										<input type="radio" id="repsalt" name="repsrb"><label class="radiolbl" for="repsalt">Alternate</label>
+										<input type="radio" id="reps10" name="repsrb"><label class="radiolbl" for="reps10">10/2</label>
 								</td>
 						</tr>	
 						<tr>
 								<td style="width: 15%">
 										Swing
 								<td>
-										<input type="radio" id="sw2" name="swtyperb" checked="sw2"><label class="radiolbl" for="sw2">2H</label>
-										<input type="radio" id="sw1" name="swtyperb" checked="sw1"><label class="radiolbl" for="sw1">1H</label>
+										<input type="radio" id="sw2" name="swtyperb"><label class="radiolbl" for="sw2">2H</label>
+										<input type="radio" id="sw1" name="swtyperb"><label class="radiolbl" for="sw1">1H</label>
 								</td>
 						</tr>	
 						<tr>
 								<td style="width: 15%">
 										Pushup (optional)
 								<td>
-										<input type="radio" id="pup" name="putyperb" checked="pup"><label class="radiolbl" for="pup">Palms</label>
-										<input type="radio" id="puf" name="putyperb" checked="puf"><label class="radiolbl" for="puf">Fists</label>
+										<input type="radio" id="pup" name="putyperb"><label class="radiolbl" for="pup">Palms</label>
+										<input type="radio" id="puf" name="putyperb"><label class="radiolbl" for="puf">Fists</label>
 								</td>
 						</tr>	
 				</table>
 			<br/>
 
+			<input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 60px;"/>
 
+			Cycles: <label id="cycles">0</label>
+			<label id="timer"></label>
 
-            <table style="font-size: large">
+			<table style="font-size: large">
                 <tr>
                     <td style="text-align: center">
                         minutes
@@ -94,21 +95,6 @@
 
 		</div>
 
-	    <br/>
-	
-		<table>
-			<tr>
-				<td><input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 60px;"/></td>
-				<td><div id="clock" style="width: 100px; height: 100px;"></div></td>
-			</tr>
-		</table>
-
-        <table>
-            <tr>
-                <td>Cycles: <label id="cycles">0</label></td>
-                <td><img id="directionImage" style="display: none" /></td>
-            </tr>
-        </table>
 		
 		<br/>
 		
