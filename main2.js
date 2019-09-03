@@ -1,11 +1,22 @@
 function init() {
+	// Reps/sets: 5/4 or 10/2 or alternate
+	const reps5_4 = "5/4"
+	const reps10_2 = "10/2"
+	const repsAlt = "alt"
+
+	// Swing type: Two-are or One-arm
+	const sw2 = "2"
+	const sw1 = "1"
+
+	// Pushup type: Plams or Fists
+	const pup = "palms"
+	const puf = "fists"
+
     // global vars
     timers = [];
     sounds = [];
 	holdMultiply = 1;
 	exhaleMultiply = 1;
-	direction = "right";
-	isMetronomeSoundPlaying = false;
 	ticksDuration = 3000; // The ticks3Sound must have this exact duration:
 
 	getDummyVideoElement().volume = 0;
@@ -14,7 +25,6 @@ function init() {
 	gongSound = createJPlayer("#jplayerGong", "audio/gong.ogg", false);
 	gong3Sound = createJPlayer("#jplayerGong3", "audio/gong3.ogg", false);
 	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
-	metronomeSound = createJPlayer("#jplayerMetronome", "audio/metronome.ogg", true);
 
 	// input elements
 	series2Element=$("#series2");
@@ -41,15 +51,11 @@ function init() {
     documentVersionElement = $("#documentVersion");
 
 	startStopElement=$("#startStop");
-	clockElement=$("#clock");
+	timerElement=$("#timer");
 	keepUnlockedMessageElement=$("#keepUnlockedMessage");
 	cyclesElement=$("#cycles");
 	configInputElements = $("#config :input");
 
-	directionImageElement = $("#directionImage");
-
-	clockCircle=clockElement.TimeCircles({ start: false, time: { Days: { show: false }, Hours: { show: false }, Minutes: { show: false }, Seconds: { text: "Hello" } }});
-	
 	series2Element.click(refreshExerciseTimes);
 	series3Element.click(refreshExerciseTimes);
 	series4Element.click(refreshExerciseTimes);
@@ -78,7 +84,82 @@ function version() {
 }
 
 function rand() {
-	d = dice()
+	// rand series
+	dice = throwDice()
+	series = diceToSeries(dice)
+
+	// "if you rolled the same rep count as the last session, roll again"
+	while (series == getSeries()) {
+		dice = throwDice()
+		series = diceToSeries(dice)
+	}
+
+	setSeries(series)
+
+	// rand reps/sets
+	setReps(throwDice())
+
+	// swing type
+	setSwingType(throwDice())
+
+	// pushup type
+	setPushupType(throwDice())
+}
+
+function diceToSeries(dice) {
+	if (dice == 1)
+		return 2
+	if (dice == 2 || dice == 3)
+		return 3
+	if (dice == 4 || dice == 5)
+		return 4
+	return 5
+}
+
+function getSeries() {
+	if (series2Element.is(':checked'))
+		return 2
+	if (series3Element.is(':checked'))
+		return 3
+	if (series3Element.is(':checked'))
+		return 3
+	if (series4Element.is(':checked'))
+		return 4
+	return 5
+}
+
+function setSeries(series) {
+	if (series == 2)
+		series2Element.prop("checked", true);
+	else if (series == 3)
+		series3Element.prop("checked", true);
+	else if (series == 4)
+		series4Element.prop("checked", true);
+	else
+		series5Element.prop("checked", true);
+}
+
+function setReps(dice) {
+	if (dice == 1 || dice == 2)
+		reps5Element.prop("checked", true);
+	else if (dice == 3 || dice == 4)
+		repsaltElement.prop("checked", true);
+	else
+		reps10Element.prop("checked", true);
+}
+
+function setSwingType(dice) {
+	if (dice == 1 || dice == 2 || dice == 3)
+		sw2Element.prop("checked", true);
+	else
+		sw1Element.prop("checked", true);
+}
+
+function setPushupType(dice) {
+	if (dice == 1 || dice == 2 || dice == 3)
+		pupElement.prop("checked", true);
+	else
+		pufElement.prop("checked", true);
 }
 
 function startStop() {
@@ -106,7 +187,6 @@ function start() {
     inhaleDuration = inhaleElement.val() * 1000;
 
     configInputElements.attr("disabled", true); // disable inputs
-    setDirectionImage("right");
 
     durationMinutes = timeElement.val();
     endTime = new Date(new Date().getTime() + (durationMinutes * 60 * 1000));
@@ -123,15 +203,12 @@ function stop() {
     hideKeepUnlockedMessage();
     timeElement.show()
     timeDisplayElement.hide();
-    directionImageElement.hide();
 
     timers.forEach(function (timer) { clearTimeout(timer); });
     timers = [];
 
     sounds.forEach(function (sound) { sound.jPlayer("stop"); });
 
-    isMetronomeSoundPlaying = false;
-    clockCircle.stop();
     configInputElements.attr("disabled", false);
     setSecondsText('finished');
 }
@@ -165,10 +242,6 @@ function createJPlayer(elementSelector, audioUrl, shouldLoop) {
 
 function isTestMode() {
     return window.location.search.indexOf('test') > -1;
-}
-
-function metronomeMode() {
-    return window.location.search.indexOf('metronome') > -1;
 }
 
 // Use a function instead of storing the selector at "init" (I think that if you do that, then you can't 'play' the video from js on some smartphones)
@@ -222,17 +295,7 @@ function refreshExerciseTimes() {
 }
 
 function test() {
-    metronomeSound.jPlayer("play");
-
-        //$("#jplayerGong").jPlayer({
-        //    ready: function () {
-        //        $(this).jPlayer("setMedia", {
-        //            mp3: "audio/gong.ogg"
-        //        }).jPlayer("play");
-
-        //    },
-        //    loop: true
-        //});
+    gongSound.jPlayer("play");
 }
 
 function getCyclesCount() {
@@ -252,34 +315,13 @@ function hideKeepUnlockedMessage() {
     keepUnlockedMessageElement.fadeOut(500);
 }
 
-function setDirectionImage(imageDirection) {
-    directionImageElement.show();
-
-    if (imageDirection === 'switch') {
-        if (direction === 'right')
-            imageDirection = 'left';
-        else
-            imageDirection = 'right';
-    }
-        
-    direction = imageDirection;
-
-    if (direction === 'right')
-        directionImageElement.attr("src", "images/arrow-right.png");
-    else if (direction === 'left')
-        directionImageElement.attr("src", "images/arrow-left.png");
-    else
-        directionImageElement.attr("src", "");
-
-}
 function mySetTimeout(func, duration) {
 	var timer = setTimeout(func, duration);
 	timers.push(timer);
 }
 
 function setSecondsText(text) {
-	clockCircle.options.time.Seconds.text = text;
-	clockCircle.rebuild();
+	timerElement.val = text
 }
 
 function doWork(state) {
@@ -296,12 +338,6 @@ function doWork(state) {
 	    gong = false;
 	}
 	else if (state === 'inhale') {	
-	    // Start metronome on first inhale
-	    if (!isMetronomeSoundPlaying && metronomeMode()) {
-	        metronomeSound.jPlayer("play");
-	        isMetronomeSoundPlaying = true;
-	    }
-
 		duration = inhaleDuration;
 		nextState = 'hold';
 	}
@@ -339,11 +375,10 @@ function doWork(state) {
 		// Increment cycles counter at the end of the cycle
 	    if (state === 'exhale') {
 	        setCyclesCount(getCyclesCount() + 0.5);
-	        setDirectionImage("switch");
 	    }
 
         // stop if this is the end of a full cycle (just switched to 'right' for the next cycle) and only 30 seconds or less left
-	    if (state === 'exhale' && direction === 'right' && getTimeLeftMilli() <= 30000)
+	    if (state === 'exhale' && getTimeLeftMilli() <= 30000)
 	        stop();
         else
 	        doWork(nextState); 
@@ -375,16 +410,6 @@ function pad(number) {
     return (number < 10) ? '0' + number.toString() : number.toString();
 }
 
-//function hasEnoughTimeForAnotherFullCycle() {
-//    var halfCycleDuration = inhaleDuration + (inhaleDuration * holdMultiply) + (inhaleDuration * exhaleMultiply);
-//    var fullCycleDuration = halfCycleDuration * 2;
-
-//    var timeLeftDuration = getTimeLeftMilli();
-//    timeLeftDuration += 30000; // 30 seconds grace to finish another cycle
-
-//    return fullCycleDuration <= timeLeftDuration;
-//}
-
 function getTimeLeftMilli() {
     return endTime - new Date().getTime();
 }
@@ -394,10 +419,15 @@ function play3Ticks() {
 }
 
 function restartClock(durationMilli) {
-	clockElement.data('timer', durationMilli / 1000);
-	clockCircle.restart();
+	setSecondsText(durationMilli / 1000)
 }
 
-function dice() {
-	return Math.floor((Math.random() * 6) + 1);
+function throwDice() {
+	dice = Math.floor((Math.random() * 6) + 1);
+	debug("dice: " + dice)
+	return dice
+}
+
+function debug(msg) {
+	console.log(msg)
 }
