@@ -76,7 +76,16 @@ function init() {
 	if (isTestMode())
 	    testBtnElement.show();
 
-	documentVersionElement.text(document.lastModified);
+	documentVersionElement.text(version());
+}
+
+function version() {
+	d = new Date(document.lastModified)
+	major = d.getUTCFullYear() - 2019
+	minor = d.getUTCMonth() + 1
+	build = d.getUTCDate()
+	rev = d.getUTCHours() * 100 + d.getUTCMinutes()
+	return major + "." + minor + "." + build + "." + rev
 }
 
 function rand() {
