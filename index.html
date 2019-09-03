@@ -53,6 +53,10 @@
 								</td>
 						</tr>
 						<tr>
+							<td style="width: 15%"></td>
+							<td>Volume: 40 Swings + 40 Pushups</td>
+						</tr>
+						<tr>
 								<td style="width: 15%">
 										Reps/sets
 								<td>
@@ -78,26 +82,22 @@
 								</td>
 						</tr>	
 				</table>
-			<br/>
-
-			<input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 60px;"/>
-
-			Cycles: <label id="cycles">0</label>
-			<label id="timer"></label>
-
-			<table style="font-size: large">
-                <tr>
-                    <td style="text-align: center">
-                        minutes
-                    </td>
-                </tr>
-            </table>
-
 		</div>
-
-		
+		<input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 60px;"/>
+		01:32 / 12:00 (elapsed)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Swings series 1 of 2<br/>
+		<label class="plan">
+			<br/>
+			<label class="big">
+				Now: <label class="now">Swings 5L</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next: Rest<br/>
+			</label>
+		</label>
 		<br/>
-		
+
+
+
+		<label id="timer" class="timer">00</label> sec
+	
+		<br/>
 		<div id="keepUnlockedMessage" style="display: none">
 			<p style="font-size:12px">
 				<label>IMPORTANT: Keep the device UNLOCKED</label>
@@ -118,7 +118,7 @@
 
     <input id="testBtn" value="Test" type="button" onclick="test()" style="display: none"/>
 
-    <div class="version"><label>ver:</label><label id="documentVersion"></label></div>
+	<div class="version"><label>ver:</label><label id="documentVersion"></label></div>
 </body>
 </html>
 

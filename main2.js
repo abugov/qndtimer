@@ -53,7 +53,6 @@ function init() {
 	startStopElement=$("#startStop");
 	timerElement=$("#timer");
 	keepUnlockedMessageElement=$("#keepUnlockedMessage");
-	cyclesElement=$("#cycles");
 	configInputElements = $("#config :input");
 
 	series2Element.click(refreshExerciseTimes);
