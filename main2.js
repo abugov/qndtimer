@@ -85,25 +85,25 @@ function version() {
 
 function rand() {
 	// rand series
-	dice = throwDice()
+	dice = rollDice()
 	series = diceToSeries(dice)
 
 	// "if you rolled the same rep count as the last session, roll again"
 	while (series == getSeries()) {
-		dice = throwDice()
+		dice = rollDice()
 		series = diceToSeries(dice)
 	}
 
 	setSeries(series)
 
 	// rand reps/sets
-	setReps(throwDice())
+	setReps(rollDice())
 
 	// swing type
-	setSwingType(throwDice())
+	setSwingType(rollDice())
 
 	// pushup type
-	setPushupType(throwDice())
+	setPushupType(rollDice())
 }
 
 function diceToSeries(dice) {
@@ -422,9 +422,9 @@ function restartClock(durationMilli) {
 	setSecondsText(durationMilli / 1000)
 }
 
-function throwDice() {
+function rollDice() {
 	dice = Math.floor((Math.random() * 6) + 1);
-	debug("dice: " + dice)
+	//debug("dice: " + dice)
 	return dice
 }
 
