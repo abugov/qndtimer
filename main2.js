@@ -15,6 +15,9 @@ const sw1 = "1";
 const pup = "palms";
 const puf = "fists";
 
+// ready phase duration
+const readyMilli = 5000;
+
 function init() {
 	// global vars
 	trainingSession = [];
@@ -69,21 +72,21 @@ function init() {
 
 	loadFromStorage();
 
-	sessionSwingElement.click(configChanged);
-	sessionSnatchElement.click(configChanged);
-	series2Element.click(configChanged);
-	series3Element.click(configChanged);
-	series4Element.click(configChanged);
-	series5Element.click(configChanged);
-	reps5Element.click(configChanged);
-	reps10Element.click(configChanged);
-	repsaltElement.click(configChanged);
-	sw2Element.click(configChanged);
-	sw1Element.click(configChanged);
-	pupElement.click(configChanged);
-	pufElement.click(configChanged);
+	sessionSwingElement.click(refreshConfig);
+	sessionSnatchElement.click(refreshConfig);
+	series2Element.click(refreshConfig);
+	series3Element.click(refreshConfig);
+	series4Element.click(refreshConfig);
+	series5Element.click(refreshConfig);
+	reps5Element.click(refreshConfig);
+	reps10Element.click(refreshConfig);
+	repsaltElement.click(refreshConfig);
+	sw2Element.click(refreshConfig);
+	sw1Element.click(refreshConfig);
+	pupElement.click(refreshConfig);
+	pufElement.click(refreshConfig);
 	
-	configChanged();
+	refreshConfig();
 
 	window.addEventListener("load", function () { window.scrollTo(0, 0); });
 	document.addEventListener("touchmove", function (e) { e.preventDefault() });
@@ -125,7 +128,7 @@ function rand() {
 	// pushup type
 	setPushupType(rollDice());
 
-	configChanged();
+	refreshConfig();
 }
 
 function diceToSeries(dice) {
@@ -278,7 +281,7 @@ function saveToStorage() {
 	saveRadio(pufElement);
 }
 
-function configChanged() {
+function refreshConfig() {
 	saveToStorage();
 
 	session = getSessionType();
@@ -293,6 +296,7 @@ function configChanged() {
 	var totalTimeMins = getSeries() * 3 /*min*/ * 2 /*swings+pushups*/;
 	setTotalTimeText(totalTimeMins + ":00");
 
+	setTimerText("0");
 	setCurrentSeriesText("");
 	setCurrentSetText("");
 	setNextSetText("");
@@ -456,9 +460,9 @@ function start() {
 
 	touchUserElements();
 
-	sessionStartTime = new Date();
+	sessionStartTime = new Date(new Date().getTime() + readyMilli);
 
-    mySetTimeout(function () { startSet(0); }, 0);
+    mySetTimeout(function () { startSet(-1); }, 0);
     mySetTimeout(function () { runClockAndPreventDisplayTurnOff(); }, 0);
 }
 
@@ -472,41 +476,46 @@ function stop() {
 
     sounds.forEach(function (sound) { sound.jPlayer("stop"); });
 
-    configInputElements.attr("disabled", false);
-	setTimerText('0');
-	setElapsedText('00:00');
-	setTotalTimeText('00:00');
-	setCurrentSeriesText("");
-	setCurrentSetText("");
-	setNextSetText("");
+	configInputElements.attr("disabled", false);
+
+	// reset run elements
+	refreshConfig();
 }
 
 function startSet(index) {
-	var set = trainingSession[index];
+	var duration = 0;
 
-	var duration = set.time * 1000;
+	if (index == -1) {
+		duration = readyMilli;
+		setCurrentSetText("Get Ready ...");
+		setNextSetText(trainingSession[0].name);
+	} 
+	else {
+		var set = trainingSession[index];
+
+		duration = set.time * 1000;
+		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec");
+
+		setCurrentSeriesText(set.type + " series " + set.series + " of " + getSeries());
+		setCurrentSetText(set.name);
+
+		if (index == trainingSession.length - 1)
+			setNextSetText("Done!");
+		else
+			setNextSetText(trainingSession[index+1].name);	
+	}
+	
 	setEndTime = new Date(new Date().getTime() + duration);
-	var endTime = pad(setEndTime.getHours()) + ":" + pad(setEndTime.getMinutes()) + ":" + pad(setEndTime.getSeconds());
 
-	debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec, end: " + endTime);
+	// reset timer
+	setTimerText(duration / 1000)
 
 	gongSound.jPlayer("stop");
 	gongSound.jPlayer("play");
-
-	setCurrentSeriesText(set.type + " series " + set.series + " of " + getSeries());
-	setCurrentSetText(set.name);
-
-	if (index == trainingSession.length - 1)
-		setNextSetText("Done!");
-	else
-		setNextSetText(trainingSession[index+1].name);
-
-	// reset timer
-	setTimerText(set.time)
 	
 	// play 3 ticks towards the end of the phase
 	var ticksStart = duration - ticksDuration;
-	mySetTimeout(function(){ play3Ticks(); }, ticksStart); 
+	mySetTimeout(function(){ play3Ticks(); }, ticksStart);
 	
 	// Start the next interval or stop if time ended
 	mySetTimeout(function(){
@@ -525,9 +534,16 @@ function runClockAndPreventDisplayTurnOff() {
 	setTimerText(Math.ceil(timeLeft / 1000));
 
 	var elapsed = new Date() - sessionStartTime;
-	var minutes = Math.floor(elapsed / 60000);
-  	var seconds = ((elapsed % 60000) / 1000).toFixed(0);
-	setElapsedText(pad(minutes) + ":" + pad(seconds))
+
+	if (elapsed < 0) {
+		// ready phase
+		setElapsedText("-00:" + pad(Math.floor(elapsed / -1000)))
+	}
+	else {
+		var minutes = Math.floor(elapsed / 60000);
+  		var seconds = ((elapsed % 60000) / 1000).toFixed(0);
+		setElapsedText(pad(minutes) + ":" + pad(seconds))
+	}
 
     getDummyVideoElement().play();
     getDummyVideoElement().pause();
