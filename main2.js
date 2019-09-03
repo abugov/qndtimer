@@ -1,32 +1,43 @@
+// Session: swings & pushups or snatched
+const session_swing = "swing";
+const session_snatch = "snatch";
+
+// Reps/sets: 5/4 or 10/2 or alternate
+const reps5_4 = "5/4";
+const reps10_2 = "10/2";
+const repsAlt = "alt";
+
+// Swing type: Two-are or One-arm
+const sw2 = "2";
+const sw1 = "1";
+
+// Pushup type: Plams or Fists
+const pup = "palms";
+const puf = "fists";
+
 function init() {
-	// Reps/sets: 5/4 or 10/2 or alternate
-	const reps5_4 = "5/4"
-	const reps10_2 = "10/2"
-	const repsAlt = "alt"
-
-	// Swing type: Two-are or One-arm
-	const sw2 = "2"
-	const sw1 = "1"
-
-	// Pushup type: Plams or Fists
-	const pup = "palms"
-	const puf = "fists"
-
-    // global vars
+	// global vars
+	trainingSession = [];
+	sessionStartTime = new Date();
+	setEndTime = new Date();
     timers = [];
     sounds = [];
 	holdMultiply = 1;
 	exhaleMultiply = 1;
 	ticksDuration = 3000; // The ticks3Sound must have this exact duration:
+	debugMode = window.location.search.indexOf('debug') > -1;
 
 	getDummyVideoElement().volume = 0;
 	
     // Sounds
 	gongSound = createJPlayer("#jplayerGong", "audio/gong.ogg", false);
-	gong3Sound = createJPlayer("#jplayerGong3", "audio/gong3.ogg", false);
 	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
 
 	// input elements
+	sessionSwingElement=$("#sessionSwing");
+	sessionSnatchElement=$("#sessionSnatch");
+	sessionSwingElement.prop('checked', true);
+
 	series2Element=$("#series2");
 	series3Element=$("#series3");
 	series4Element=$("#series4");
@@ -42,11 +53,12 @@ function init() {
 	pupElement=$("#pup");
 	pufElement=$("#puf");
 	
-	inhaleElement=$("#inhale");
-	holdElement=$("#hold");
-	exhaleElement=$("#exhale");
+	elapsedElement = $("#elapsed");
+	totalTimeElement = $("#totalTime");
+	currentSeriesElement = $("#currentSeries");
 	timeElement = $("#time");
-	timeDisplayElement = $("#timeDisplay");
+	currentSetElement = $("#currentSet");
+	nextSetElement = $("#nextSet");
 	testBtnElement = $("#testBtn");
     documentVersionElement = $("#documentVersion");
 
@@ -55,14 +67,23 @@ function init() {
 	keepUnlockedMessageElement=$("#keepUnlockedMessage");
 	configInputElements = $("#config :input");
 
-	series2Element.click(refreshExerciseTimes);
-	series3Element.click(refreshExerciseTimes);
-	series4Element.click(refreshExerciseTimes);
-	series5Element.click(refreshExerciseTimes);
-	inhaleElement.keyup(refreshExerciseTimes);
-
 	loadFromStorage();
-	refreshExerciseTimes();
+
+	sessionSwingElement.click(configChanged);
+	sessionSnatchElement.click(configChanged);
+	series2Element.click(configChanged);
+	series3Element.click(configChanged);
+	series4Element.click(configChanged);
+	series5Element.click(configChanged);
+	reps5Element.click(configChanged);
+	reps10Element.click(configChanged);
+	repsaltElement.click(configChanged);
+	sw2Element.click(configChanged);
+	sw1Element.click(configChanged);
+	pupElement.click(configChanged);
+	pufElement.click(configChanged);
+	
+	configChanged();
 
 	window.addEventListener("load", function () { window.scrollTo(0, 0); });
 	document.addEventListener("touchmove", function (e) { e.preventDefault() });
@@ -74,57 +95,59 @@ function init() {
 }
 
 function version() {
-	d = new Date(document.lastModified)
-	major = d.getUTCFullYear() - 2019
-	minor = d.getUTCMonth() + 1
-	build = d.getUTCDate()
-	rev = d.getUTCHours() * 100 + d.getUTCMinutes()
-	return major + "." + minor + "." + build + "." + rev
+	d = new Date(document.lastModified);
+	major = d.getUTCFullYear() - 2019;
+	minor = d.getUTCMonth() + 1;
+	build = d.getUTCDate();
+	rev = d.getUTCHours() * 100 + d.getUTCMinutes();
+	return major + "." + minor + "." + build + "." + rev;
 }
 
 function rand() {
 	// rand series
-	dice = rollDice()
-	series = diceToSeries(dice)
+	dice = rollDice();
+	series = diceToSeries(dice);
 
 	// "if you rolled the same rep count as the last session, roll again"
 	while (series == getSeries()) {
-		dice = rollDice()
-		series = diceToSeries(dice)
+		dice = rollDice();
+		series = diceToSeries(dice);
 	}
 
-	setSeries(series)
+	setSeries(series);
 
 	// rand reps/sets
-	setReps(rollDice())
+	setRepsAndSets(rollDice());
 
 	// swing type
-	setSwingType(rollDice())
+	setSwingType(rollDice());
 
 	// pushup type
-	setPushupType(rollDice())
+	setPushupType(rollDice());
+
+	configChanged();
 }
 
 function diceToSeries(dice) {
 	if (dice == 1)
-		return 2
+		return 2;
 	if (dice == 2 || dice == 3)
-		return 3
+		return 3;
 	if (dice == 4 || dice == 5)
-		return 4
-	return 5
+		return 4;
+	return 5;
 }
 
 function getSeries() {
 	if (series2Element.is(':checked'))
-		return 2
+		return 2;
 	if (series3Element.is(':checked'))
-		return 3
+		return 3;
 	if (series3Element.is(':checked'))
-		return 3
+		return 3;
 	if (series4Element.is(':checked'))
-		return 4
-	return 5
+		return 4;
+	return 5;
 }
 
 function setSeries(series) {
@@ -138,13 +161,33 @@ function setSeries(series) {
 		series5Element.prop("checked", true);
 }
 
-function setReps(dice) {
+function getSessionType() {
+	if (sessionSnatchElement.is(':checked'))
+		return session_snatch;
+	return session_swing;
+}
+
+function getRepsAndSets() {
+	if (reps5Element.is(':checked'))
+		return reps5_4;
+	if (repsaltElement.is(':checked'))
+		return repsAlt;
+	return reps10_2;
+}
+
+function setRepsAndSets(dice) {
 	if (dice == 1 || dice == 2)
 		reps5Element.prop("checked", true);
 	else if (dice == 3 || dice == 4)
 		repsaltElement.prop("checked", true);
 	else
 		reps10Element.prop("checked", true);
+}
+
+function getSwingType() {
+	if (sw2Element.is(':checked'))
+		return sw2;
+	return sw1;
 }
 
 function setSwingType(dice) {
@@ -154,62 +197,17 @@ function setSwingType(dice) {
 		sw1Element.prop("checked", true);
 }
 
+function getPushupType() {
+	if (pupElement.is(':checked'))
+		return pup;
+	return puf;
+}
+
 function setPushupType(dice) {
 	if (dice == 1 || dice == 2 || dice == 3)
 		pupElement.prop("checked", true);
 	else
 		pufElement.prop("checked", true);
-}
-
-function startStop() {
-    if (startStopElement.val() == "Start")
-        start();
-    else
-        stop();
-}
-
-function start() {
-    startStopElement.val('Reset');
-    saveToStorage();
-    timeElement.hide()
-    timeDisplayElement.show();
-
-    setCyclesCount(0); // reset cycles display
-    showKeepUnlockedMessage();
-
-    // if inhale value is invalid - change to 1
-    if ($.isNumeric(inhaleElement.val()) == false || inhaleElement.val() < 1) {
-        inhaleElement.val(1);
-        refreshExerciseTimes();
-    }
-
-    inhaleDuration = inhaleElement.val() * 1000;
-
-    configInputElements.attr("disabled", true); // disable inputs
-
-    durationMinutes = timeElement.val();
-    endTime = new Date(new Date().getTime() + (durationMinutes * 60 * 1000));
-
-    touchUserElements();
-
-    mySetTimeout(function () { doWork('prepare'); }, 0);
-    mySetTimeout(function () { runClockAndPreventDisplayTurnOff(); }, 0);
-}
-
-function stop() {
-    startStopElement.val('Start');
-    getDummyVideoElement().pause();
-    hideKeepUnlockedMessage();
-    timeElement.show()
-    timeDisplayElement.hide();
-
-    timers.forEach(function (timer) { clearTimeout(timer); });
-    timers = [];
-
-    sounds.forEach(function (sound) { sound.jPlayer("stop"); });
-
-    configInputElements.attr("disabled", false);
-    setSecondsText('finished');
 }
 
 // This method is part of a user-event callstack (the user clicks the "Start button")
@@ -249,6 +247,8 @@ function getDummyVideoElement() {
 }
 
 function loadFromStorage() {
+	loadRadio(sessionSwingElement);
+	loadRadio(sessionSnatchElement);
 	loadRadio(series2Element);
 	loadRadio(series3Element);
 	loadRadio(series4Element);
@@ -263,6 +263,8 @@ function loadFromStorage() {
 }
 
 function saveToStorage() {
+	saveRadio(sessionSwingElement);
+	saveRadio(sessionSnatchElement);
 	saveRadio(series2Element);
 	saveRadio(series3Element);
 	saveRadio(series4Element);
@@ -276,34 +278,129 @@ function saveToStorage() {
 	saveRadio(pufElement);
 }
 
-function refreshExerciseTimes() {
-	if ($.isNumeric(inhaleElement.val()) ==  true && inhaleElement.val() < 1)
-		inhaleElement.val(1);
+function configChanged() {
+	saveToStorage();
 
-	if (series2Element.is(':checked')) {
-		holdMultiply = 4;
-		exhaleMultiply = 2;
-	}
-	else {
-		holdMultiply = 1.5;
-		exhaleMultiply = 2;
+	session = getSessionType();
+
+	//session_swing
+	if (session == session_snatch) {
+		alert("Snatched are not supported yet");
+		sessionSwingElement.prop('checked', true)
+		return;
 	}
 
-	holdElement.text((inhaleElement.val() * holdMultiply).toString());
-	exhaleElement.text((inhaleElement.val() * exhaleMultiply).toString());
+	var totalTimeMins = getSeries() * 3 /*min*/ * 2 /*swings+pushups*/;
+	setTotalTimeText(totalTimeMins + ":00");
+
+	setCurrentSeriesText("");
+	setCurrentSetText("");
+	setNextSetText("");
+
+	var series = getSeries();
+
+	trainingSession = getSwingsSeries(series);
+	trainingSession = trainingSession.concat(getPushupsSeries(series));
+
+	debug("=== training session: ===");
+
+	for (i = 0; i < trainingSession.length; i++) {
+		set = trainingSession[i];
+		debug("series " + set.series + ": " + set.name + " " + set.time + " sec");
+	}
+}
+
+function getSwingsSeries(series) {
+	result = [];
+
+	var grip = "R";
+
+	function getGrip() {
+		if (getSwingType() == sw2)
+			grip = " (2H)";
+		else if (grip == "R")
+			grip = "L";
+		else
+			grip = "R";
+
+		return grip;
+	}
+
+	repsAndSets = getRepsAndSets();
+	curRepsAndSets = reps10_2;
+
+	for (i = 0; i < series; i++) {
+		if (repsAndSets == repsAlt) {
+			// alternate reps and sets
+			if (curRepsAndSets == reps10_2)
+				curRepsAndSets = reps5_4;
+			else
+				curRepsAndSets = reps10_2;
+		} else {
+			curRepsAndSets = repsAndSets;
+		}
+
+		if (curRepsAndSets == reps5_4) {
+			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
+		}
+		else {
+			result.push({ name: "Swings 10" + getGrip(), type: "Swings", series: i+1, time: 60 });
+			result.push({ name: "Swings 10" + getGrip(), type: "Swings", series: i+1, time: 60 });
+			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
+		}
+	}
+
+	return result;
+}
+
+function getPushupsSeries(series) {
+	result = [];
+
+	var grip;
+
+	if (getPushupType()== pup)
+		grip = "(Palms)";
+	else
+		grip = "(Fists)";
+
+	repsAndSets = getRepsAndSets();
+	curRepsAndSets = reps10_2;
+
+	for (i = 0; i < series; i++) {
+		if (repsAndSets == repsAlt) {
+			// alternate reps and sets
+			if (curRepsAndSets == reps10_2)
+				curRepsAndSets = reps5_4;
+			else
+				curRepsAndSets = reps10_2;
+		} else {
+			curRepsAndSets = repsAndSets;
+		}
+
+		if (curRepsAndSets == reps5_4) {
+			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
+		}
+		else {
+			result.push({ name: "Pushups 10 " + grip, type: "Pushups", series: i+1, time: 60 });
+			result.push({ name: "Pushups 10 " + grip, type: "Pushups", series: i+1, time: 60 });
+			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
+		}
+	}
+
+	return result;
 }
 
 function test() {
+	gongSound.jPlayer("stop");
     gongSound.jPlayer("play");
-}
-
-function getCyclesCount() {
-    return parseFloat(cyclesElement.val());
-}
-
-function setCyclesCount(count) {
-    cyclesElement.val(count);
-    cyclesElement.text(count);
 }
 
 function showKeepUnlockedMessage() {
@@ -319,83 +416,118 @@ function mySetTimeout(func, duration) {
 	timers.push(timer);
 }
 
-function setSecondsText(text) {
-	timerElement.val = text
+function setTimerText(text) {
+	timerElement.text(text)
 }
 
-function doWork(state) {
-	setSecondsText(state);
-    
-    var gong = true;
-	var duration;	
-	var nextState;
-  
-    // Calc state duration and get the next state
-	if (state === 'prepare') {
-	    duration = 5000;
-	    nextState = 'inhale';
-	    gong = false;
-	}
-	else if (state === 'inhale') {	
-		duration = inhaleDuration;
-		nextState = 'hold';
-	}
-	else if (state === 'hold') {
-		duration = inhaleDuration * holdMultiply;
-		nextState = 'exhale';
-	}	
-	else if (state === 'exhale') {
-		duration = inhaleDuration * exhaleMultiply;
-		nextState = 'inhale';
-	}
+function setElapsedText(text) {
+	elapsedElement.text(text)
+}
 
-	isLastExhale = state === 'exhale' && getTimeLeftMilli() <= duration;
+function setCurrentSetText(text) {
+	currentSetElement.text(text)
+}
 
-	if (gong) {
-        // play 1 gong or 3 gongs at the end of the last cycle
-	    if (isLastExhale) {
-	        gong3Sound.jPlayer("stop");
-	        gong3Sound.jPlayer("play");
-	    }
-	    else {
-	        gongSound.jPlayer("stop");
-	        gongSound.jPlayer("play");
-	    }
-	}
+function setNextSetText(text) {
+	nextSetElement.text(text)
+}
 
-    restartClock(duration);
+function setTotalTimeText(text) {
+	totalTimeElement.text(text)
+}
+
+function setCurrentSeriesText(text) {
+	currentSeriesElement.text(text)
+}
+
+function startStop() {
+    if (startStopElement.val() == "Start")
+        start();
+    else
+        stop();
+}
+
+function start() {
+    startStopElement.val('Reset');
+
+    showKeepUnlockedMessage();
+
+    configInputElements.attr("disabled", true); // disable inputs
+
+	touchUserElements();
+
+	sessionStartTime = new Date();
+
+    mySetTimeout(function () { startSet(0); }, 0);
+    mySetTimeout(function () { runClockAndPreventDisplayTurnOff(); }, 0);
+}
+
+function stop() {
+    startStopElement.val('Start');
+    getDummyVideoElement().pause();
+    hideKeepUnlockedMessage();
+
+    timers.forEach(function (timer) { clearTimeout(timer); });
+    timers = [];
+
+    sounds.forEach(function (sound) { sound.jPlayer("stop"); });
+
+    configInputElements.attr("disabled", false);
+	setTimerText('0');
+	setElapsedText('00:00');
+	setTotalTimeText('00:00');
+	setCurrentSeriesText("");
+	setCurrentSetText("");
+	setNextSetText("");
+}
+
+function startSet(index) {
+	var set = trainingSession[index];
+
+	var duration = set.time * 1000;
+	setEndTime = new Date(new Date().getTime() + duration);
+	var endTime = pad(setEndTime.getHours()) + ":" + pad(setEndTime.getMinutes()) + ":" + pad(setEndTime.getSeconds());
+
+	debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec, end: " + endTime);
+
+	gongSound.jPlayer("stop");
+	gongSound.jPlayer("play");
+
+	setCurrentSeriesText(set.type + " series " + set.series + " of " + getSeries());
+	setCurrentSetText(set.name);
+
+	if (index == trainingSession.length - 1)
+		setNextSetText("Done!");
+	else
+		setNextSetText(trainingSession[index+1].name);
+
+	// reset timer
+	setTimerText(set.time)
 	
 	// play 3 ticks towards the end of the phase
 	var ticksStart = duration - ticksDuration;
 	mySetTimeout(function(){ play3Ticks(); }, ticksStart); 
 	
 	// Start the next interval or stop if time ended
-	mySetTimeout(function(){ 
-		// Increment cycles counter at the end of the cycle
-	    if (state === 'exhale') {
-	        setCyclesCount(getCyclesCount() + 0.5);
-	    }
+	mySetTimeout(function(){
+		++index;
 
         // stop if this is the end of a full cycle (just switched to 'right' for the next cycle) and only 30 seconds or less left
-	    if (state === 'exhale' && getTimeLeftMilli() <= 30000)
+	    if (index == trainingSession.length)
 	        stop();
         else
-	        doWork(nextState); 
+			startSet(index); 
 	}, duration);
 }
 
 function runClockAndPreventDisplayTurnOff() {
-    // update time display
-    var timeLeftMilli = getTimeLeftMilli();
-    var timeLeftMinutes = 0;
-    var timeLeftSeconds = 0;
+	var timeLeft = setEndTime - new Date();
+	setTimerText(Math.ceil(timeLeft / 1000));
 
-    if (timeLeftMilli >= 0) {
-        var timeLeftMinutes = Math.floor((timeLeftMilli % 36e5) / 6e4);
-        var timeLeftSeconds = Math.floor((timeLeftMilli % 6e4) / 1000);
-    }
-
-    timeDisplayElement.text(pad(timeLeftMinutes) + ":" + pad(timeLeftSeconds));
+	var elapsed = new Date() - sessionStartTime;
+	var minutes = Math.floor(elapsed / 60000);
+  	var seconds = ((elapsed % 60000) / 1000).toFixed(0);
+	setElapsedText(pad(minutes) + ":" + pad(seconds))
 
     getDummyVideoElement().play();
     getDummyVideoElement().pause();
@@ -409,16 +541,8 @@ function pad(number) {
     return (number < 10) ? '0' + number.toString() : number.toString();
 }
 
-function getTimeLeftMilli() {
-    return endTime - new Date().getTime();
-}
-
 function play3Ticks() {
     ticks3Sound.jPlayer("play");
-}
-
-function restartClock(durationMilli) {
-	setSecondsText(durationMilli / 1000)
 }
 
 function rollDice() {
@@ -428,5 +552,6 @@ function rollDice() {
 }
 
 function debug(msg) {
-	console.log(msg)
+	if (debugMode)
+		console.log(msg)
 }

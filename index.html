@@ -35,13 +35,20 @@
 	<link rel="stylesheet" href="main.css" />
 </head>
 
-<body onload="init()" style="width: 300px; height: 200px;">
+<body onload="init()" style="width: 350px;">
 	<br/>
 	<div align="center">
-		<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px;"/>
+		
 			
 		<div id="config">
-				<table style="width: 500px">
+				<div>
+					<input type="radio" id="sessionSwing" name="sessionrb"><label class="radiolbl" for="sessionSwing">Swings & Pushups</label>
+					<input type="radio" id="sessionSnatch" name="sessionrb"><label class="radiolbl" for="sessionSnatch">Snatches</label>
+				</div>
+
+				<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px;"/>
+
+				<table>
 						<tr>
 								<td style="width: 15%">
 										Series#
@@ -51,10 +58,6 @@
 										<input type="radio" id="series4" name="seriesrb"><label class="radiolbl" for="series4">4</label>
 										<input type="radio" id="series5" name="seriesrb"><label class="radiolbl" for="series5">5</label>
 								</td>
-						</tr>
-						<tr>
-							<td style="width: 15%"></td>
-							<td>Volume: 40 Swings + 40 Pushups</td>
 						</tr>
 						<tr>
 								<td style="width: 15%">
@@ -83,26 +86,20 @@
 						</tr>	
 				</table>
 		</div>
-		<input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 60px;"/>
-		01:32 / 12:00 (elapsed)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Swings series 1 of 2<br/>
+		<input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 80px;"/>
+		<label id="elapsed">00:00</label> / <label id="totalTime">00:00</label> (elapsed)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label id="currentSeries">Swings series 1 of 2</label><br/>
 		<label class="plan">
 			<br/>
 			<label class="big">
-				Now: <label class="now">Swings 5L</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Next: Rest<br/>
+				Now: <label id="currentSet" class="now">Swings 5L</label>&nbsp;&nbsp;&nbsp;<label id="timer" class="timer">0</label> sec<br/>
+				Next: <label id="nextSet">Rest</label><br/>
 			</label>
 		</label>
-		<br/>
 
-
-
-		<label id="timer" class="timer">00</label> sec
-	
 		<br/>
 		<div id="keepUnlockedMessage" style="display: none">
 			<p style="font-size:12px">
-				<label>IMPORTANT: Keep the device UNLOCKED</label>
-				<br/>
-				<label style="font-size:10px">(otherwise the timer will stop after a few minutes)</label>
+				<label>(Keep device UNLOCKED)</label>
 			</p>
 		</div>
 	</div>
