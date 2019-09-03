@@ -36,10 +36,10 @@
 	<link rel="stylesheet" href="timeCircles/timeCircles.css" />
 </head>
 
-<body style="width: 300px; height: 200px">
+<body onload="init()" style="width: 300px; height: 200px;">
 	<br/>
 	<div align="center">
-		<input id="startStop" value="Random" type="button" onClick="startStop()" style="width: 80px;"/>
+		<input id="rand" value="Random" type="button" onClick="rand()" style="width: 80px;"/>
 			
 		<div id="config">
 				<table style="width: 500px">
@@ -55,74 +55,36 @@
 						</tr>
 						<tr>
 								<td style="width: 15%">
-										Series#
+										Reps/sets
 								<td>
+										<input type="radio" id="reps5" name="repsrb" checked="reps5"><label for="reps5">5/4</label>
+										<input type="radio" id="reps10" name="repsrb" checked="reps10"><label for="reps10">10/2</label>
+										<input type="radio" id="repsalt" name="repsrb" checked="repsalt"><label for="repsalt">Alternate</label>
+								</td>
+						</tr>	
+						<tr>
+								<td style="width: 15%">
+										Swing
+								<td>
+										<input type="radio" id="sw2" name="swtyperb" checked="sw2"><label for="sw2">2H</label>
+										<input type="radio" id="sw1" name="swtyperb" checked="sw1"><label for="sw1">1H</label>
+								</td>
+						</tr>	
+						<tr>
+								<td style="width: 15%">
+										Pushup (optional)
+								<td>
+										<input type="radio" id="pup" name="putyperb" checked="pup"><label for="pup">Palms</label>
+										<input type="radio" id="puf" name="putyperb" checked="puf"><label for="puf">Fists</label>
 								</td>
 						</tr>	
 				</table>
-
-				<div id="series" class="group">
-						<div class="title">Series#</div>
-						<input type="radio" id="series2" name="seriesrb" checked="series2"><label for="series2">2</label>
-						<input type="radio" id="series3" name="seriesrb" checked="series3"><label for="series3">3</label>
-						<input type="radio" id="series4" name="seriesrb" checked="series4"><label for="series4">4</label>
-						<input type="radio" id="series5" name="seriesrb" checked="series5"><label for="series5">5</label>
-					</div>
-			
-					<div id="reps" class="group">
-							<div class="title">Reps/sets</div>
-							<input type="radio" id="reps5" name="repsrb" checked="reps5"><label for="reps5">5/4</label>
-							<input type="radio" id="resp10" name="repsrb" checked="resp10"><label for="resp10">10/2</label>
-							<input type="radio" id="repsalt" name="repsrb" checked="repsalt"><label for="repsalt">Alternate</label>
-					</div>
-
-					<div id="swtype" class="group">
-							<div class="title">Swing type</div>
-							<input type="radio" id="sw2" name="swtyperb" checked="sw2"><label for="sw2">2H</label>
-							<input type="radio" id="sw1" name="swtyperb" checked="sw1"><label for="sw1">1H</label>
-					</div>
-
-					<div id="putype" class="group">
-							<div class="title">Pushup type (optional)</div>
-							<input type="radio" id="pup" name="putyperb" checked="pup"><label for="pup">Palms</label>
-							<input type="radio" id="puf" name="putyperb" checked="puf"><label for="puf">Fists</label>
-					</div>
 			<br/>
 
-		    <table>
-		        <tr>
-		            <td style="width: 70px">
-		            Inhale:
-		            <td style="width: 50px">
-		                <input id="inhale" type="number" pattern="[0-9]*" value="7" min="1" style="width: 30px"/>
-		            </td>
-		        </tr>
-		        <tr>
-		            <td>
-		                Hold:
-		            </td>
-		            <td>
-		                <label id="hold"></label>
-		            </td>
-		        </tr>
-		        <tr>
-		            <td>
-		                Exhale:
-		            </td>
-		            <td>
-		                <label id="exhale"></label>
-		            </td>
-		        </tr>
-		    </table>
 
-		    <br/>
 
             <table style="font-size: large">
                 <tr>
-                    <td style="width: 50px; text-align: center">
-                        <input id="time" type="number" pattern="[0-9]*" value="15" min="1" style="width: 50px; text-align: center" />
-                        <label id="timeDisplay" style="display: none"></label>
-                    </td>
                     <td style="text-align: center">
                         minutes
                     </td>
