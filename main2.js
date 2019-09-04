@@ -499,7 +499,7 @@ function startSet(index) {
 	if (index == -1) {
 		duration = readyMilli;
 		setCurrentSetText("Ready ...");
-		setCurrentSeriesText("");
+		setCurrentSeriesText(trainingSession[0].type + " " + trainingSession[0].series + " of " + getSeries());
 		setNextSetText(trainingSession[0].name);
 	} 
 	else {
@@ -549,7 +549,7 @@ function runClockAndPreventDisplayTurnOff() {
 
 	if (elapsed < 0) {
 		// ready phase (session start time is in the future)
-		setElapsedText("-00:" + pad(Math.floor(elapsed / -1000)))
+		setElapsedText("00:00")
 	}
 	else {
 		var minutes = Math.floor(elapsed / 60000);
