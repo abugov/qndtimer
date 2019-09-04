@@ -101,7 +101,7 @@ input[type="radio"]:checked + .radiolbl:before {
 }
 
 .big {
-  font-size: large;
+  font-size: x-large;
 }
 
 .now {

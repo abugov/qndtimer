@@ -327,18 +327,20 @@ function refreshConfig() {
 function getSwingsSeries(series) {
 	result = [];
 
-	var grip = "R";
+	var grip = getSwingType() == sw2 ? "Two-arm" : "One-arm";
+	var side = "R";
 
-	function getGrip() {
+	function getSide() {
 		if (getSwingType() == sw2)
-			grip = " (2H)";
-		else if (grip == "R")
-			grip = "L";
+			side = "";
+		else if (side == "R")
+			side = "L";
 		else
-			grip = "R";
+			side = "R";
 
-		return grip;
+		return side;
 	}
+
 
 	repsAndSets = getRepsAndSets();
 	curRepsAndSets = reps10_2;
@@ -355,15 +357,15 @@ function getSwingsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings 5" + getGrip(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
 			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
 		}
 		else {
-			result.push({ name: "Swings 10" + getGrip(), type: "Swings", series: i+1, time: 60 });
-			result.push({ name: "Swings 10" + getGrip(), type: "Swings", series: i+1, time: 60 });
+			result.push({ name: "Swings " + grip + ": 10" + getSide(), type: "Swings", series: i+1, time: 60 });
+			result.push({ name: "Swings " + grip + ": 10" + getSide(), type: "Swings", series: i+1, time: 60 });
 			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
 		}
 	}
@@ -374,12 +376,7 @@ function getSwingsSeries(series) {
 function getPushupsSeries(series) {
 	result = [];
 
-	var grip;
-
-	if (getPushupType() == pup)
-		grip = "(Palms)";
-	else
-		grip = "(Fists)";
+	var grip = getPushupType() == pup ? "Palms" : "Fists";
 
 	repsAndSets = getRepsAndSets();
 	curRepsAndSets = reps10_2;
@@ -396,15 +393,15 @@ function getPushupsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups 5 " + grip, type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
 			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
 		}
 		else {
-			result.push({ name: "Pushups 10 " + grip, type: "Pushups", series: i+1, time: 60 });
-			result.push({ name: "Pushups 10 " + grip, type: "Pushups", series: i+1, time: 60 });
+			result.push({ name: "Pushups " + grip + ": 10", type: "Pushups", series: i+1, time: 60 });
+			result.push({ name: "Pushups " + grip + ": 10", type: "Pushups", series: i+1, time: 60 });
 			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
 		}
 	}
