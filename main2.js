@@ -297,9 +297,8 @@ function refreshConfig() {
 
 	session = getSessionType();
 
-	//session_swing
 	if (session == session_snatch) {
-		alert("Snatched are not supported yet");
+		alert("Snatches are not supported yet");
 		sessionSwingElement.prop('checked', true)
 		return;
 	}
@@ -377,7 +376,7 @@ function getPushupsSeries(series) {
 
 	var grip;
 
-	if (getPushupType()== pup)
+	if (getPushupType() == pup)
 		grip = "(Palms)";
 	else
 		grip = "(Fists)";
@@ -463,11 +462,10 @@ function startStop() {
     else {
 		start();
 	}
-
-	running = !running;
 }
 
 function start() {
+	running = true;
 	configElement.hide( "fast" );
 	runElement.show( "fast" );
 
@@ -482,6 +480,7 @@ function start() {
 }
 
 function stop() {
+	running = false;
 	configElement.show( "fast" );
 	runElement.hide( "fast" );
     getDummyVideoElement().pause();
@@ -552,7 +551,7 @@ function runClockAndPreventDisplayTurnOff() {
 	var elapsed = new Date() - sessionStartTime;
 
 	if (elapsed < 0) {
-		// ready phase
+		// ready phase (session start time is in the future)
 		setElapsedText("-00:" + pad(Math.floor(elapsed / -1000)))
 	}
 	else {
