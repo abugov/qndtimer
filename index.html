@@ -37,85 +37,80 @@
 
 <body onload="init()" style="width: 350px;">
 	<br/>
-	<div align="center">
-		
-			
-		<div id="config">
-				<div>
-					<input type="radio" id="sessionSwing" name="sessionrb"><label class="radiolbl" for="sessionSwing">Swings & Pushups</label>
-					<input type="radio" id="sessionSnatch" name="sessionrb"><label class="radiolbl" for="sessionSnatch">Snatches</label>
-				</div>
+	<div id="config">
+		<div style="text-align:center">
+			<input type="radio" id="sessionSwing" name="sessionrb"><label class="radiolbl" for="sessionSwing">Swings & Pushups</label>
+			<input type="radio" id="sessionSnatch" name="sessionrb"><label class="radiolbl" for="sessionSnatch">Snatches</label>
+			<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px"/>
 
-				<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px;"/>
-
-				<table>
-						<tr>
-								<td style="width: 15%">
-										Series#
-								<td>
-										<input type="radio" id="series2" name="seriesrb"><label class="radiolbl" for="series2">2</label>
-										<input type="radio" id="series3" name="seriesrb"><label class="radiolbl" for="series3">3</label>
-										<input type="radio" id="series4" name="seriesrb"><label class="radiolbl" for="series4">4</label>
-										<input type="radio" id="series5" name="seriesrb"><label class="radiolbl" for="series5">5</label>
-								</td>
-						</tr>
-						<tr>
-								<td style="width: 15%">
-										Reps/sets
-								<td>
-										<input type="radio" id="reps5" name="repsrb"><label class="radiolbl" for="reps5">5/4</label>
-										<input type="radio" id="repsalt" name="repsrb"><label class="radiolbl" for="repsalt">Alternate</label>
-										<input type="radio" id="reps10" name="repsrb"><label class="radiolbl" for="reps10">10/2</label>
-								</td>
-						</tr>	
-						<tr>
-								<td style="width: 15%">
-										Swing
-								<td>
-										<input type="radio" id="sw2" name="swtyperb"><label class="radiolbl" for="sw2">2H</label>
-										<input type="radio" id="sw1" name="swtyperb"><label class="radiolbl" for="sw1">1H</label>
-								</td>
-						</tr>	
-						<tr>
-								<td style="width: 15%">
-										Pushup
-								<td>
-										<input type="radio" id="pup" name="putyperb"><label class="radiolbl" for="pup">Palms</label>
-										<input type="radio" id="puf" name="putyperb"><label class="radiolbl" for="puf">Fists</label>
-								</td>
-						</tr>	
-				</table>
 		</div>
-		<input id="startStop" value="Start" type="button" onClick="startStop()" style="width: 80px;"/>
-		<label id="elapsed">00:00</label> / <label id="totalTime">00:00</label> (elapsed)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label id="currentSeries">Swings series 1 of 2</label><br/>
-		<label class="plan">
+
+
+		Number of series
+		<div style="text-align:center">
+			<input type="radio" id="series2" name="seriesrb"><label class="radiolbl" for="series2">2</label>
+			<input type="radio" id="series3" name="seriesrb"><label class="radiolbl" for="series3">3</label>
+			<input type="radio" id="series4" name="seriesrb"><label class="radiolbl" for="series4">4</label>
+			<input type="radio" id="series5" name="seriesrb"><label class="radiolbl" for="series5">5</label>
+		</div>
+		
+		Reps/Sets
+		<div style="text-align:center">
+			<input type="radio" id="reps5" name="repsrb"><label class="radiolbl" for="reps5">5/4</label>
+			<input type="radio" id="repsalt" name="repsrb"><label class="radiolbl" for="repsalt">Alternate</label>
+			<input type="radio" id="reps10" name="repsrb"><label class="radiolbl" for="reps10">10/2</label>
+		</div>
+
+		Swing Type
+		<div style="text-align:center">
+			<input type="radio" id="sw2" name="swtyperb"><label class="radiolbl" for="sw2">2H</label>
+			<input type="radio" id="sw1" name="swtyperb"><label class="radiolbl" for="sw1">1H</label>
+		</div>
+
+		Pushup Type
+		<div style="text-align:center">
+			<input type="radio" id="pup" name="putyperb"><label class="radiolbl" for="pup">Palms</label>
+			<input type="radio" id="puf" name="putyperb"><label class="radiolbl" for="puf">Fists</label>
+		</div>
+
+		<div style="text-align:center">
+			<input value="Start" type="button" onClick="startStop()" style="width: 80px;"/>
+		</div>
+
+		<div class="version">ver:<label id="documentVersion"></label></div>
+	</div>
+
+	<div id="run" style="text-align:center; display: none">
+		<input value="Stop" type="button" onClick="startStop()" style="width: 80px;"/>
+		
+		<div class="plan">
+				<label id="elapsed">00:00</label> / <label id="totalTime">00:00</label><br/>
+				<label id="currentSeries">Swings 1 of 2</label><br/>
 			<br/>
 			<label class="big">
-				Now: <label id="currentSet" class="now">Swings 5L</label>&nbsp;&nbsp;&nbsp;<label id="timer" class="timer">0</label> sec<br/>
-				Next: <label id="nextSet">Rest</label><br/>
+				<label id="currentSet" class="now">Swings 5L</label></br>
+				<label id="timer" class="timer">0</label><label class="timerSeconds">s</label><br/>
+				Next:<br/>
+				<label id="nextSet">Rest</label><br/>
 			</label>
 		</label>
 
 		<br/>
 		<div id="keepUnlockedMessage" style="display: none">
-			<p style="font-size:12px">
-				<label>(Keep device UNLOCKED)</label>
-			</p>
+			<label class="keepUnlock">(Keep device UNLOCKED)</label>
 		</div>
+
+		<div id="jplayerGong"></div>
+		<div id="jplayerGong3"></div>
+		<div id="jplayerTicks3"></div>
+		<div id="jplayerMetronome"></div>
+
+		<video id="dummyVideo" volume="0" width="100" height="100" loop>
+		<source src="video/DummyMovie.mp4" type="video/mp4">
+		</video>
+
+		<input id="testBtn" value="Test" type="button" onclick="test()" style="display: none"/>
 	</div>
-
-    <div id="jplayerGong"></div>
-    <div id="jplayerGong3"></div>
-    <div id="jplayerTicks3"></div>
-    <div id="jplayerMetronome"></div>
-
-    <video id="dummyVideo" volume="0" width="0" loop>
-	  <source src="video/DummyMovie.mp4" type="video/mp4">
-	</video>
-
-    <input id="testBtn" value="Test" type="button" onclick="test()" style="display: none"/>
-
-	<div class="version"><label>ver:</label><label id="documentVersion"></label></div>
 </body>
 </html>
 

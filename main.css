@@ -16,7 +16,6 @@ select{
 
 input[type=button] {
  -webkit-appearance: none; -moz-appearance: none;
- display: block;
  margin: 1.5em 0;
  font-size: 1em; line-height: 2.5em;
  color: #333;
@@ -97,8 +96,8 @@ input[type="radio"]:checked + .radiolbl:before {
 }
 
 .plan {
-  text-align: left; 
   font-weight: normal;
+  font-size: 20px;
 }
 
 .big {
@@ -107,9 +106,30 @@ input[type="radio"]:checked + .radiolbl:before {
 
 .now {
   color: yellow;
+  font-size: 25px;
 }
 
 .timer {
   color: yellow;
-  font-size: 50px;
+  font-size: 100px;
+}
+
+.timerSeconds {
+  color: yellow;
+}
+
+.center-block {
+  margin: auto;
+  display: block;
+}
+
+.keepUnlock {
+  color: red;
+  font-size: 20px;
+}
+
+#dummyVideo {
+  position: absolute;
+  left: 0;
+  top: 0;
 }

@@ -20,6 +20,7 @@ const readyMilli = 5000;
 
 function init() {
 	// global vars
+	running = false;
 	trainingSession = [];
 	sessionStartTime = new Date();
 	setEndTime = new Date();
@@ -36,7 +37,10 @@ function init() {
 	gongSound = createJPlayer("#jplayerGong", "audio/gong.ogg", false);
 	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
 
-	// input elements
+
+	// elements
+	configElement = $("#config");
+	runElement = $("#run");
 	sessionSwingElement=$("#sessionSwing");
 	sessionSnatchElement=$("#sessionSnatch");
 	sessionSwingElement.prop('checked', true);
@@ -65,7 +69,6 @@ function init() {
 	testBtnElement = $("#testBtn");
     documentVersionElement = $("#documentVersion");
 
-	startStopElement=$("#startStop");
 	timerElement=$("#timer");
 	keepUnlockedMessageElement=$("#keepUnlockedMessage");
 	configInputElements = $("#config :input");
@@ -95,6 +98,14 @@ function init() {
 	    testBtnElement.show();
 
 	documentVersionElement.text(version());
+
+	$(window).blur(function() {
+		showKeepUnlockedMessage();
+	});
+
+	$(window).focus(function() {
+        hideKeepUnlockedMessage();
+    });
 }
 
 function version() {
@@ -408,7 +419,8 @@ function test() {
 }
 
 function showKeepUnlockedMessage() {
-    keepUnlockedMessageElement.fadeIn(1000);
+	ticks3Sound.jPlayer("play");
+    keepUnlockedMessageElement.show();
 }
 
 function hideKeepUnlockedMessage() {
@@ -445,16 +457,19 @@ function setCurrentSeriesText(text) {
 }
 
 function startStop() {
-    if (startStopElement.val() == "Start")
-        start();
-    else
-        stop();
+	if (running) {
+		stop();
+	}
+    else {
+		start();
+	}
+
+	running = !running;
 }
 
 function start() {
-    startStopElement.val('Reset');
-
-    showKeepUnlockedMessage();
+	configElement.hide( "fast" );
+	runElement.show( "fast" );
 
     configInputElements.attr("disabled", true); // disable inputs
 
@@ -467,9 +482,9 @@ function start() {
 }
 
 function stop() {
-    startStopElement.val('Start');
+	configElement.show( "fast" );
+	runElement.hide( "fast" );
     getDummyVideoElement().pause();
-    hideKeepUnlockedMessage();
 
     timers.forEach(function (timer) { clearTimeout(timer); });
     timers = [];
@@ -487,7 +502,8 @@ function startSet(index) {
 
 	if (index == -1) {
 		duration = readyMilli;
-		setCurrentSetText("Get Ready ...");
+		setCurrentSetText("Ready ...");
+		setCurrentSeriesText("");
 		setNextSetText(trainingSession[0].name);
 	} 
 	else {
@@ -496,7 +512,7 @@ function startSet(index) {
 		duration = set.time * 1000;
 		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec");
 
-		setCurrentSeriesText(set.type + " series " + set.series + " of " + getSeries());
+		setCurrentSeriesText(set.type + " " + set.series + " of " + getSeries());
 		setCurrentSetText(set.name);
 
 		if (index == trainingSession.length - 1)
@@ -545,8 +561,8 @@ function runClockAndPreventDisplayTurnOff() {
 		setElapsedText(pad(minutes) + ":" + pad(seconds))
 	}
 
-    getDummyVideoElement().play();
     getDummyVideoElement().pause();
+    getDummyVideoElement().play();
 
     mySetTimeout(function () {
         runClockAndPreventDisplayTurnOff();
@@ -554,7 +570,7 @@ function runClockAndPreventDisplayTurnOff() {
 }
 
 function pad(number) {
-    return (number < 10) ? '0' + number.toString() : number.toString();
+    return (number < 10 ? "0" : "") + number.toString();
 }
 
 function play3Ticks() {
