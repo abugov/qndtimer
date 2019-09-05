@@ -35,7 +35,7 @@ function init() {
     // Sounds
 	gongSound = createJPlayer("#jplayerGong", "audio/gong.ogg", false);
 	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
-
+	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
 
 	// elements
 	configElement = $("#config");
@@ -419,7 +419,7 @@ function test() {
 }
 
 function showKeepUnlockedMessage() {
-	ticks3Sound.jPlayer("play");
+	exclamationSound.jPlayer("play");
     keepUnlockedMessageElement.show();
 }
 
