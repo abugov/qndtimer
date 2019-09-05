@@ -27,15 +27,15 @@ function init() {
     sounds = [];
 	holdMultiply = 1;
 	exhaleMultiply = 1;
-	ticksDuration = 3000; // The ticks3Sound must have this exact duration:
+	setEndingDuration = 3000; // 3s before the end of the set a sound will be played
 	debugMode = window.location.search.indexOf('debug') > -1;
 
 	getDummyVideoElement().volume = 0;
 	
     // Sounds
-	gongSound = createJPlayer("#jplayerGong", "audio/gong.ogg", false);
-	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
 	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
+	chargeSound = createJPlayer("#jplayerCharge", "audio/charge.ogg", false);
+	endSound = createJPlayer("#jplayerEnd", "audio/end.ogg", false);
 
 	// elements
 	configElement = $("#config");
@@ -414,11 +414,22 @@ function getPushupsSeries(series) {
 }
 
 function test() {
-	gongSound.jPlayer("stop");
-    gongSound.jPlayer("play");
+	exclamationSound.jPlayer("stop");
+    exclamationSound.jPlayer("play");
+}
+
+function playSetEnding() {
+	chargeSound.jPlayer("stop");
+    chargeSound.jPlayer("play");
+}
+
+function playSessionEnded() {
+	endSound.jPlayer("stop");
+    endSound.jPlayer("play");
 }
 
 function showKeepUnlockedMessage() {
+	exclamationSound.jPlayer("stop");
 	exclamationSound.jPlayer("play");
     keepUnlockedMessageElement.show();
 }
@@ -459,7 +470,7 @@ function setCurrentSeriesText(text) {
 
 function startStop() {
 	if (running) {
-		stop();
+		stop(true);
 	}
     else {
 		start();
@@ -496,7 +507,7 @@ function updateEndTimes(startTime) {
 	}
 }
 
-function stop() {
+function stop(manualStop) {
 	running = false;
 	configElement.show( "fast" );
 	runElement.hide( "fast" );
@@ -505,7 +516,10 @@ function stop() {
     timers.forEach(function (timer) { clearTimeout(timer); });
     timers = [];
 
-    sounds.forEach(function (sound) { sound.jPlayer("stop"); });
+	sounds.forEach(function (sound) { sound.jPlayer("stop"); });
+	
+	if (!manualStop)
+		playSessionEnded();
 
 	configInputElements.attr("disabled", false);
 
@@ -517,6 +531,7 @@ function startSet(index, sessionStartTime) {
 	if (clockTimer != null)
 		clearTimeout(clockTimer);
 	
+	var lastSet = index == trainingSession.length - 1;
 	var setEndTime = null;
 
 	if (index == -1) {
@@ -551,26 +566,20 @@ function startSet(index, sessionStartTime) {
 	else {
 		// reset timer
 		setTimerText(Math.ceil(duration / 1000))
-
-		gongSound.jPlayer("stop");
-		gongSound.jPlayer("play");
 		
-		// play 3 ticks towards the end of the phase
-		var ticksStart = duration - ticksDuration;
-		mySetTimeout(function(){ play3Ticks(); }, ticksStart);
+		// play a sound towards the end of the set, except on the last set (the session end sound will be played)
+		if (!lastSet)
+			mySetTimeout(function(){ playSetEnding(); }, duration - setEndingDuration);
 		
 		clockTimer = mySetTimeout(function () { refreshClock(sessionStartTime, setEndTime); }, 0);
 	}
 
 	// Start the next interval or stop if time ended
 	mySetTimeout(function(){
-		++index;
-
-        // stop if this is the end of a full cycle (just switched to 'right' for the next cycle) and only 30 seconds or less left
-	    if (index == trainingSession.length)
-	        stop();
+		if (lastSet)
+	        stop(false);
         else
-			startSet(index, sessionStartTime); 
+			startSet(++index, sessionStartTime); 
 	}, duration);
 }
 
@@ -597,10 +606,6 @@ function refreshClock(sessionStartTime, setEndTime) {
 
 function pad(number) {
     return (number < 10 ? "0" : "") + number.toString();
-}
-
-function play3Ticks() {
-    ticks3Sound.jPlayer("play");
 }
 
 function rollDice() {
