@@ -22,9 +22,8 @@ function init() {
 	// global vars
 	running = false;
 	trainingSession = [];
-	sessionStartTime = new Date();
-	setEndTime = new Date();
-    timers = [];
+	timers = [];
+	clockTimer = null;
     sounds = [];
 	holdMultiply = 1;
 	exhaleMultiply = 1;
@@ -99,11 +98,13 @@ function init() {
 	documentVersionElement.text(version());
 
 	$(window).blur(function() {
-		showKeepUnlockedMessage();
+		if (running)
+			showKeepUnlockedMessage();
 	});
 
 	$(window).focus(function() {
-        hideKeepUnlockedMessage();
+		if (running)
+        	hideKeepUnlockedMessage();
     });
 }
 
@@ -319,12 +320,12 @@ function refreshConfig() {
 
 	for (i = 0; i < trainingSession.length; i++) {
 		set = trainingSession[i];
-		debug("series " + set.series + ": " + set.name + " " + set.time + " sec");
+		debug("series " + set.series + ": " + set.name + ", " + set.duration / 1000 + " sec");
 	}
 }
 
-function makeSet(name, type, series, time) {
-	return { name: name, type: type, series: series, time: time, endTime: new Date()}
+function makeSet(name, type, series, duration) {
+	return { name: name, type: type, series: series, duration: duration, endTime: new Date()}
 }
 
 function getSwingsSeries(series) {
@@ -360,16 +361,16 @@ function getSwingsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30));
-			result.push(makeSet("Rest","Swings", i+1, 60));
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet("Rest","Swings", i+1, 60000));
 		}
 		else {
-			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60));
-			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60));
-			result.push(makeSet("Rest","Swings", i+1, 60));
+			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
+			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
+			result.push(makeSet("Rest","Swings", i+1, 60000));
 		}
 	}
 
@@ -396,16 +397,16 @@ function getPushupsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30));
-			result.push(makeSet("Rest", "Pushups", i+1, 60));
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet("Rest", "Pushups", i+1, 60000));
 		}
 		else {
-			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60));
-			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60));
-			result.push(makeSet("Rest", "Pushups", i+1, 60));
+			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
+			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
+			result.push(makeSet("Rest", "Pushups", i+1, 60000));
 		}
 	}
 
@@ -423,12 +424,13 @@ function showKeepUnlockedMessage() {
 }
 
 function hideKeepUnlockedMessage() {
-    keepUnlockedMessageElement.fadeOut(500);
+    keepUnlockedMessageElement.fadeOut(7000);
 }
 
 function mySetTimeout(func, duration) {
 	var timer = setTimeout(func, duration);
 	timers.push(timer);
+	return timer;
 }
 
 function setTimerText(text) {
@@ -473,10 +475,25 @@ function start() {
 
 	touchUserElements();
 
-	sessionStartTime = new Date(new Date().getTime() + readyMilli);
+	// prevent screen lock
+	getDummyVideoElement().pause();
+	getDummyVideoElement().play();
 
-    mySetTimeout(function () { startSet(-1); }, 0);
-    mySetTimeout(function () { runClockAndPreventDisplayTurnOff(); }, 0);
+	updateEndTimes(new Date(new Date().getTime() + readyMilli))
+	
+	var sessionStartTime = new Date(new Date().getTime() + readyMilli);
+
+    mySetTimeout(function () { startSet(-1, sessionStartTime); }, 0);
+}
+
+function updateEndTimes(startTime) {
+	endTime = startTime;
+	for (i = 0; i < trainingSession.length; i++) {
+		set = trainingSession[i];
+		endTime = new Date(endTime.getTime() + set.duration);
+		set.endTime = endTime;
+		debug(set.name + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
+	}
 }
 
 function stop() {
@@ -496,11 +513,15 @@ function stop() {
 	refreshConfig();
 }
 
-function startSet(index) {
-	var duration = 0;
+function startSet(index, sessionStartTime) {
+	if (clockTimer != null)
+		clearTimeout(clockTimer);
+	
+	var setEndTime = null;
 
 	if (index == -1) {
-		duration = readyMilli;
+		//duration = readyMilli;
+		setEndTime = sessionStartTime;
 		setCurrentSetText("Ready ...");
 		setCurrentSeriesText(trainingSession[0].type + " series " + trainingSession[0].series + " / " + getSeries());
 		setNextSetText(trainingSession[0].name);
@@ -508,8 +529,9 @@ function startSet(index) {
 	else {
 		var set = trainingSession[index];
 
-		duration = set.time * 1000;
-		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec");
+		//duration = set.duration;
+		setEndTime = set.endTime;
+		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.duration + " sec");
 
 		setCurrentSeriesText(set.type + " series " + set.series + " / " + getSeries());
 		setCurrentSetText(set.name);
@@ -520,18 +542,26 @@ function startSet(index) {
 			setNextSetText(trainingSession[index+1].name);	
 	}
 	
-	setEndTime = new Date(new Date().getTime() + duration);
+	// calc duration using the set end time that was planned instead of simply using the set duration, this is to fix time shifting due to js engine being stopped when the web browser is losing focus
+	var duration = setEndTime - new Date().getTime();
 
-	// reset timer
-	setTimerText(duration / 1000)
+	if (duration < 0) {
+		duration = 0;
+	}
+	else {
+		// reset timer
+		setTimerText(Math.ceil(duration / 1000))
 
-	gongSound.jPlayer("stop");
-	gongSound.jPlayer("play");
-	
-	// play 3 ticks towards the end of the phase
-	var ticksStart = duration - ticksDuration;
-	mySetTimeout(function(){ play3Ticks(); }, ticksStart);
-	
+		gongSound.jPlayer("stop");
+		gongSound.jPlayer("play");
+		
+		// play 3 ticks towards the end of the phase
+		var ticksStart = duration - ticksDuration;
+		mySetTimeout(function(){ play3Ticks(); }, ticksStart);
+		
+		clockTimer = mySetTimeout(function () { refreshClock(sessionStartTime, setEndTime); }, 0);
+	}
+
 	// Start the next interval or stop if time ended
 	mySetTimeout(function(){
 		++index;
@@ -540,12 +570,12 @@ function startSet(index) {
 	    if (index == trainingSession.length)
 	        stop();
         else
-			startSet(index); 
+			startSet(index, sessionStartTime); 
 	}, duration);
 }
 
-function runClockAndPreventDisplayTurnOff() {
-	var timeLeft = setEndTime - new Date();
+function refreshClock(sessionStartTime, setEndTime) {
+	var timeLeft = setEndTime.getTime() - new Date();
 	setTimerText(Math.ceil(timeLeft / 1000));
 
 	var elapsed = new Date() - sessionStartTime;
@@ -560,11 +590,8 @@ function runClockAndPreventDisplayTurnOff() {
 		setElapsedText(pad(minutes) + ":" + pad(seconds))
 	}
 
-    getDummyVideoElement().pause();
-    getDummyVideoElement().play();
-
-    mySetTimeout(function () {
-        runClockAndPreventDisplayTurnOff();
+    clockTimer = mySetTimeout(function () {
+        refreshClock(sessionStartTime, setEndTime);
     }, 1000);
 }
 
