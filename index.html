@@ -37,48 +37,37 @@
 
 <body onload="init()" style="width: 320px;">
 	<br/>
-	<div id="config">
-		<div style="text-align:center">
-			<input type="radio" id="sessionSwing" name="sessionrb"><label class="radiolbl" for="sessionSwing">Swings & Pushups</label>
-			<input type="radio" id="sessionSnatch" name="sessionrb"><label class="radiolbl" for="sessionSnatch">Snatches</label>
-			<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px"/>
+	<div id="config" style="text-align:center">
+		<input type="radio" id="sessionSwing" name="sessionrb" checked="checked"><label class="radiolbl" for="sessionSwing">Swings & Pushups</label>
+		<input type="radio" id="sessionSnatch" name="sessionrb"><label class="radiolbl" for="sessionSnatch">Snatches</label>
+		<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px"/>
 
-		</div>
-
-
-		Number of series
-		<div style="text-align:center">
-			<input type="radio" id="series2" name="seriesrb"><label class="radiolbl" for="series2">2</label>
+		<div class="configGroup" style="text-align:left; display: inline-block">
+			Number of series:
+			<br/>
+			<input type="radio" id="series2" name="seriesrb" checked="checked"><label class="radiolbl" for="series2">2</label>
 			<input type="radio" id="series3" name="seriesrb"><label class="radiolbl" for="series3">3</label>
 			<input type="radio" id="series4" name="seriesrb"><label class="radiolbl" for="series4">4</label>
 			<input type="radio" id="series5" name="seriesrb"><label class="radiolbl" for="series5">5</label>
 		</div>
-		<br/>
-		
-		Reps/Sets
-		<div style="text-align:center">
-			<input type="radio" id="reps5" name="repsrb"><label class="radiolbl" for="reps5">5/4</label>
+
+		<div class="configGroup">
+			<input type="radio" id="reps5" name="repsrb" checked="checked"><label class="radiolbl" for="reps5">5/4</label>
 			<input type="radio" id="repsalt" name="repsrb"><label class="radiolbl" for="repsalt">Alternate</label>
 			<input type="radio" id="reps10" name="repsrb"><label class="radiolbl" for="reps10">10/2</label>
 		</div>
-		<br/>
 
-		Swing Type
-		<div style="text-align:center">
-			<input type="radio" id="sw2" name="swtyperb"><label class="radiolbl" for="sw2">2H</label>
-			<input type="radio" id="sw1" name="swtyperb"><label class="radiolbl" for="sw1">1H</label>
+		<div class="configGroup">
+			<input type="radio" id="sw2" name="swtyperb" checked="checked"><label class="radiolbl" for="sw2">Two-arm Swings</label>
+			<input type="radio" id="sw1" name="swtyperb"><label class="radiolbl" for="sw1">One-arm</label>
 		</div>
-		<br/>
 
-		Pushup Type
-		<div style="text-align:center">
-			<input type="radio" id="pup" name="putyperb"><label class="radiolbl" for="pup">Palms</label>
+		<div class="configGroup">
+			<input type="radio" id="pup" name="putyperb" checked="checked"><label class="radiolbl" for="pup">Palms Pushups</label>
 			<input type="radio" id="puf" name="putyperb"><label class="radiolbl" for="puf">Fists</label>
 		</div>
 
-		<div style="text-align:center">
-			<input value="Start" type="button" onClick="startStop()" style="width: 80px;"/>
-		</div>
+		<input value="Start" type="button" onClick="startStop()" style="width: 80px;"/>
 
 		<div class="version">ver: <label id="documentVersion"></label></div>
 	</div>
@@ -88,11 +77,10 @@
 		
 		<div class="plan">
 				<label id="elapsed">00:00</label> / <label id="totalTime">00:00</label><br/>
-				<label id="currentSeries">Swings 1 of 2</label><br/>
-			<br/>
+				<label id="currentSeries">Swings series 1/2</label><br/>
 			<label class="big">
-				<label id="currentSet" class="now">Swings 5L</label></br>
 				<label id="timer" class="timer">0</label><label class="timerSeconds">s</label><br/>
+				<label id="currentSet" class="now">Swings 5L</label></br>
 				Next:<br/>
 				<label id="nextSet">Rest</label><br/>
 			</label>

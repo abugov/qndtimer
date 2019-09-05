@@ -43,7 +43,6 @@ function init() {
 	runElement = $("#run");
 	sessionSwingElement=$("#sessionSwing");
 	sessionSnatchElement=$("#sessionSnatch");
-	sessionSwingElement.prop('checked', true);
 
 	series2Element=$("#series2");
 	series3Element=$("#series3");
@@ -357,15 +356,15 @@ function getSwingsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: grip + " Swings: 5" + getSide(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: grip + " Swings: 5" + getSide(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: grip + " Swings: 5" + getSide(), type: "Swings", series: i+1, time: 30 });
+			result.push({ name: grip + " Swings: 5" + getSide(), type: "Swings", series: i+1, time: 30 });
 			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
 		}
 		else {
-			result.push({ name: "Swings " + grip + ": 10" + getSide(), type: "Swings", series: i+1, time: 60 });
-			result.push({ name: "Swings " + grip + ": 10" + getSide(), type: "Swings", series: i+1, time: 60 });
+			result.push({ name: grip + " Swings: 10" + getSide(), type: "Swings", series: i+1, time: 60 });
+			result.push({ name: grip + " Swings: 10" + getSide(), type: "Swings", series: i+1, time: 60 });
 			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
 		}
 	}
@@ -393,15 +392,15 @@ function getPushupsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: grip + " Pushups: 5", type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: grip + " Pushups: 5", type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: grip + " Pushups: 5", type: "Pushups", series: i+1, time: 30 });
+			result.push({ name: grip + " Pushups: 5", type: "Pushups", series: i+1, time: 30 });
 			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
 		}
 		else {
-			result.push({ name: "Pushups " + grip + ": 10", type: "Pushups", series: i+1, time: 60 });
-			result.push({ name: "Pushups " + grip + ": 10", type: "Pushups", series: i+1, time: 60 });
+			result.push({ name: grip + " Pushups: 10", type: "Pushups", series: i+1, time: 60 });
+			result.push({ name: grip + " Pushups: 10", type: "Pushups", series: i+1, time: 60 });
 			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
 		}
 	}
@@ -499,7 +498,7 @@ function startSet(index) {
 	if (index == -1) {
 		duration = readyMilli;
 		setCurrentSetText("Ready ...");
-		setCurrentSeriesText(trainingSession[0].type + " " + trainingSession[0].series + " of " + getSeries());
+		setCurrentSeriesText(trainingSession[0].type + " series " + trainingSession[0].series + " / " + getSeries());
 		setNextSetText(trainingSession[0].name);
 	} 
 	else {
@@ -508,7 +507,7 @@ function startSet(index) {
 		duration = set.time * 1000;
 		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec");
 
-		setCurrentSeriesText(set.type + " " + set.series + " of " + getSeries());
+		setCurrentSeriesText(set.type + " series " + set.series + " / " + getSeries());
 		setCurrentSetText(set.name);
 
 		if (index == trainingSession.length - 1)
@@ -575,7 +574,6 @@ function play3Ticks() {
 
 function rollDice() {
 	dice = Math.floor((Math.random() * 6) + 1);
-	//debug("dice: " + dice)
 	return dice
 }
 
