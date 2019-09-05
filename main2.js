@@ -22,28 +22,26 @@ function init() {
 	// global vars
 	running = false;
 	trainingSession = [];
-	sessionStartTime = new Date();
-	setEndTime = new Date();
-    timers = [];
+	timers = [];
+	clockTimer = null;
     sounds = [];
 	holdMultiply = 1;
 	exhaleMultiply = 1;
-	ticksDuration = 3000; // The ticks3Sound must have this exact duration:
+	setEndingDuration = 3000; // 3s before the end of the set a sound will be played
 	debugMode = window.location.search.indexOf('debug') > -1;
 
 	getDummyVideoElement().volume = 0;
 	
     // Sounds
-	gongSound = createJPlayer("#jplayerGong", "audio/gong.ogg", false);
-	ticks3Sound = createJPlayer("#jplayerTicks3", "audio/tick3.ogg", false);
-
+	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
+	chargeSound = createJPlayer("#jplayerCharge", "audio/charge.ogg", false);
+	endSound = createJPlayer("#jplayerEnd", "audio/end.ogg", false);
 
 	// elements
 	configElement = $("#config");
 	runElement = $("#run");
 	sessionSwingElement=$("#sessionSwing");
 	sessionSnatchElement=$("#sessionSnatch");
-	sessionSwingElement.prop('checked', true);
 
 	series2Element=$("#series2");
 	series3Element=$("#series3");
@@ -100,11 +98,13 @@ function init() {
 	documentVersionElement.text(version());
 
 	$(window).blur(function() {
-		showKeepUnlockedMessage();
+		if (running)
+			showKeepUnlockedMessage();
 	});
 
 	$(window).focus(function() {
-        hideKeepUnlockedMessage();
+		if (running)
+        	hideKeepUnlockedMessage();
     });
 }
 
@@ -320,8 +320,12 @@ function refreshConfig() {
 
 	for (i = 0; i < trainingSession.length; i++) {
 		set = trainingSession[i];
-		debug("series " + set.series + ": " + set.name + " " + set.time + " sec");
+		debug("series " + set.series + ": " + set.name + ", " + set.duration / 1000 + " sec");
 	}
+}
+
+function makeSet(name, type, series, duration) {
+	return { name: name, type: type, series: series, duration: duration, endTime: new Date()}
 }
 
 function getSwingsSeries(series) {
@@ -357,16 +361,16 @@ function getSwingsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Swings " + grip + ": 5" + getSide(), type: "Swings", series: i+1, time: 30 });
-			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet("Rest","Swings", i+1, 60000));
 		}
 		else {
-			result.push({ name: "Swings " + grip + ": 10" + getSide(), type: "Swings", series: i+1, time: 60 });
-			result.push({ name: "Swings " + grip + ": 10" + getSide(), type: "Swings", series: i+1, time: 60 });
-			result.push({ name: "Rest", type: "Swings", series: i+1, time: 60 });
+			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
+			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
+			result.push(makeSet("Rest","Swings", i+1, 60000));
 		}
 	}
 
@@ -393,16 +397,16 @@ function getPushupsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Pushups " + grip + ": 5", type: "Pushups", series: i+1, time: 30 });
-			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet("Rest", "Pushups", i+1, 60000));
 		}
 		else {
-			result.push({ name: "Pushups " + grip + ": 10", type: "Pushups", series: i+1, time: 60 });
-			result.push({ name: "Pushups " + grip + ": 10", type: "Pushups", series: i+1, time: 60 });
-			result.push({ name: "Rest", type: "Pushups", series: i+1, time: 60 });
+			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
+			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
+			result.push(makeSet("Rest", "Pushups", i+1, 60000));
 		}
 	}
 
@@ -410,22 +414,34 @@ function getPushupsSeries(series) {
 }
 
 function test() {
-	gongSound.jPlayer("stop");
-    gongSound.jPlayer("play");
+	exclamationSound.jPlayer("stop");
+    exclamationSound.jPlayer("play");
+}
+
+function playSetEnding() {
+	chargeSound.jPlayer("stop");
+    chargeSound.jPlayer("play");
+}
+
+function playSessionEnded() {
+	endSound.jPlayer("stop");
+    endSound.jPlayer("play");
 }
 
 function showKeepUnlockedMessage() {
-	ticks3Sound.jPlayer("play");
+	exclamationSound.jPlayer("stop");
+	exclamationSound.jPlayer("play");
     keepUnlockedMessageElement.show();
 }
 
 function hideKeepUnlockedMessage() {
-    keepUnlockedMessageElement.fadeOut(500);
+    keepUnlockedMessageElement.fadeOut(7000);
 }
 
 function mySetTimeout(func, duration) {
 	var timer = setTimeout(func, duration);
 	timers.push(timer);
+	return timer;
 }
 
 function setTimerText(text) {
@@ -454,7 +470,7 @@ function setCurrentSeriesText(text) {
 
 function startStop() {
 	if (running) {
-		stop();
+		stop(true);
 	}
     else {
 		start();
@@ -470,13 +486,28 @@ function start() {
 
 	touchUserElements();
 
-	sessionStartTime = new Date(new Date().getTime() + readyMilli);
+	// prevent screen lock
+	getDummyVideoElement().pause();
+	getDummyVideoElement().play();
 
-    mySetTimeout(function () { startSet(-1); }, 0);
-    mySetTimeout(function () { runClockAndPreventDisplayTurnOff(); }, 0);
+	updateEndTimes(new Date(new Date().getTime() + readyMilli))
+	
+	var sessionStartTime = new Date(new Date().getTime() + readyMilli);
+
+    mySetTimeout(function () { startSet(-1, sessionStartTime); }, 0);
 }
 
-function stop() {
+function updateEndTimes(startTime) {
+	endTime = startTime;
+	for (i = 0; i < trainingSession.length; i++) {
+		set = trainingSession[i];
+		endTime = new Date(endTime.getTime() + set.duration);
+		set.endTime = endTime;
+		debug(set.name + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
+	}
+}
+
+function stop(manualStop) {
 	running = false;
 	configElement.show( "fast" );
 	runElement.hide( "fast" );
@@ -485,7 +516,10 @@ function stop() {
     timers.forEach(function (timer) { clearTimeout(timer); });
     timers = [];
 
-    sounds.forEach(function (sound) { sound.jPlayer("stop"); });
+	sounds.forEach(function (sound) { sound.jPlayer("stop"); });
+	
+	if (!manualStop)
+		playSessionEnded();
 
 	configInputElements.attr("disabled", false);
 
@@ -493,22 +527,28 @@ function stop() {
 	refreshConfig();
 }
 
-function startSet(index) {
-	var duration = 0;
+function startSet(index, sessionStartTime) {
+	if (clockTimer != null)
+		clearTimeout(clockTimer);
+	
+	var lastSet = index == trainingSession.length - 1;
+	var setEndTime = null;
 
 	if (index == -1) {
-		duration = readyMilli;
+		//duration = readyMilli;
+		setEndTime = sessionStartTime;
 		setCurrentSetText("Ready ...");
-		setCurrentSeriesText(trainingSession[0].type + " " + trainingSession[0].series + " of " + getSeries());
+		setCurrentSeriesText(trainingSession[0].type + " series " + trainingSession[0].series + " / " + getSeries());
 		setNextSetText(trainingSession[0].name);
 	} 
 	else {
 		var set = trainingSession[index];
 
-		duration = set.time * 1000;
-		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.time + " sec");
+		//duration = set.duration;
+		setEndTime = set.endTime;
+		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.duration + " sec");
 
-		setCurrentSeriesText(set.type + " " + set.series + " of " + getSeries());
+		setCurrentSeriesText(set.type + " series " + set.series + " / " + getSeries());
 		setCurrentSetText(set.name);
 
 		if (index == trainingSession.length - 1)
@@ -517,32 +557,34 @@ function startSet(index) {
 			setNextSetText(trainingSession[index+1].name);	
 	}
 	
-	setEndTime = new Date(new Date().getTime() + duration);
+	// calc duration using the set end time that was planned instead of simply using the set duration, this is to fix time shifting due to js engine being stopped when the web browser is losing focus
+	var duration = setEndTime - new Date().getTime();
 
-	// reset timer
-	setTimerText(duration / 1000)
+	if (duration < 0) {
+		duration = 0;
+	}
+	else {
+		// reset timer
+		setTimerText(Math.ceil(duration / 1000))
+		
+		// play a sound towards the end of the set, except on the last set (the session end sound will be played)
+		if (!lastSet)
+			mySetTimeout(function(){ playSetEnding(); }, duration - setEndingDuration);
+		
+		clockTimer = mySetTimeout(function () { refreshClock(sessionStartTime, setEndTime); }, 0);
+	}
 
-	gongSound.jPlayer("stop");
-	gongSound.jPlayer("play");
-	
-	// play 3 ticks towards the end of the phase
-	var ticksStart = duration - ticksDuration;
-	mySetTimeout(function(){ play3Ticks(); }, ticksStart);
-	
 	// Start the next interval or stop if time ended
 	mySetTimeout(function(){
-		++index;
-
-        // stop if this is the end of a full cycle (just switched to 'right' for the next cycle) and only 30 seconds or less left
-	    if (index == trainingSession.length)
-	        stop();
+		if (lastSet)
+	        stop(false);
         else
-			startSet(index); 
+			startSet(++index, sessionStartTime); 
 	}, duration);
 }
 
-function runClockAndPreventDisplayTurnOff() {
-	var timeLeft = setEndTime - new Date();
+function refreshClock(sessionStartTime, setEndTime) {
+	var timeLeft = setEndTime.getTime() - new Date();
 	setTimerText(Math.ceil(timeLeft / 1000));
 
 	var elapsed = new Date() - sessionStartTime;
@@ -557,11 +599,8 @@ function runClockAndPreventDisplayTurnOff() {
 		setElapsedText(pad(minutes) + ":" + pad(seconds))
 	}
 
-    getDummyVideoElement().pause();
-    getDummyVideoElement().play();
-
-    mySetTimeout(function () {
-        runClockAndPreventDisplayTurnOff();
+    clockTimer = mySetTimeout(function () {
+        refreshClock(sessionStartTime, setEndTime);
     }, 1000);
 }
 
@@ -569,13 +608,8 @@ function pad(number) {
     return (number < 10 ? "0" : "") + number.toString();
 }
 
-function play3Ticks() {
-    ticks3Sound.jPlayer("play");
-}
-
 function rollDice() {
 	dice = Math.floor((Math.random() * 6) + 1);
-	//debug("dice: " + dice)
 	return dice
 }
 

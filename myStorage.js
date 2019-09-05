@@ -32,8 +32,9 @@ function loadRadio(radio) {
 		
 	var checked = storage(radio.attr('id'));
 	
-	if (checked != undefined)
-		radio.prop('checked', checked)
+	if (checked) {
+		radio.prop('checked', true)
+	}
 }
 
 function saveRadio(radio) {
