@@ -22,6 +22,9 @@ const domR = "R";
 // ready phase duration
 const readyMilli = 5000;
 
+// 3s before the end of the set a sound will be played
+const setEndingDuration = 3000;
+
 function init() {
 	// global vars
 	running = false;
@@ -29,17 +32,19 @@ function init() {
 	timers = [];
 	clockTimer = null;
     sounds = [];
-	holdMultiply = 1;
-	exhaleMultiply = 1;
-	setEndingDuration = 3000; // 3s before the end of the set a sound will be played
 	debugMode = window.location.search.indexOf('debug') > -1;
 
 	getDummyVideoElement().volume = 0;
+
+	if (debugMode) {
+		getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
+		getDummyVideoElement()[0].load();
+	}
 	
     // Sounds
-	exclamationSound = createJPlayer("#jplayerExclamation", "https://abugov.github.io/qndtimer/audio/exclamation.ogg", false);
-	chargeSound = createJPlayer("#jplayerCharge", "https://abugov.github.io/qndtimer/audio/charge.ogg", false);
-	endSound = createJPlayer("#jplayerEnd", "https://abugov.github.io/qndtimer/audio/end.ogg", false);
+	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
+	chargeSound = createJPlayer("#jplayerCharge", "audio/charge.ogg", false);
+	endSound = createJPlayer("#jplayerEnd", "audio/end.ogg", false);
 
 	// elements
 	configElement = $("#config");
@@ -251,8 +256,8 @@ function getDominantSide() {
 // Workaround for mobile: http://stackoverflow.com/questions/14970204/android-not-playing-html5-audio-from-an-interval
 function touchUserElements() {
     // play/pause video
-    getDummyVideoElement().play();
-    getDummyVideoElement().pause();
+    getDummyVideoElement()[0].play();
+    getDummyVideoElement()[0].pause();
 
     // Play/pause all audio
     sounds.forEach(function(sound) {
@@ -279,7 +284,7 @@ function isTestMode() {
 
 // Use a function instead of storing the selector at "init" (I think that if you do that, then you can't 'play' the video from js on some smartphones)
 function getDummyVideoElement() {
-	return document.getElementById("dummyVideo");
+	return $("#dummyVideo");
 }
 
 function loadFromStorage() {
@@ -578,8 +583,8 @@ function start() {
 	touchUserElements();
 
 	// prevent screen lock
-	getDummyVideoElement().pause();
-	getDummyVideoElement().play();
+	getDummyVideoElement()[0].pause();
+	getDummyVideoElement()[0].play();
 
 	updateEndTimes(new Date(new Date().getTime() + readyMilli))
 	
@@ -603,7 +608,7 @@ function stop(manualStop) {
 	configElement.show( "fast" );
 	runElement.hide( "fast" );
 	$(window).unbind('beforeunload', preventReload);
-	getDummyVideoElement().pause();
+	getDummyVideoElement()[0].pause();
 
     timers.forEach(function (timer) { clearTimeout(timer); });
     timers = [];
