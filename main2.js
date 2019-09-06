@@ -570,6 +570,7 @@ function preventReload() {
 
 function start() {
 	running = true;
+	configElement.hide( "fast" );
 	runElement.show( "fast" );
     configInputElements.attr("disabled", true); // disable inputs
 	$(window).on('beforeunload', preventReload);
