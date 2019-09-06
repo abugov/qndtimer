@@ -37,9 +37,9 @@ function init() {
 	getDummyVideoElement().volume = 0;
 	
     // Sounds
-	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
-	chargeSound = createJPlayer("#jplayerCharge", "audio/charge.ogg", false);
-	endSound = createJPlayer("#jplayerEnd", "audio/end.ogg", false);
+	exclamationSound = createJPlayer("#jplayerExclamation", "https://abugov.github.io/qndtimer/audio/exclamation.ogg", false);
+	chargeSound = createJPlayer("#jplayerCharge", "https://abugov.github.io/qndtimer/audio/charge.ogg", false);
+	endSound = createJPlayer("#jplayerEnd", "https://abugov.github.io/qndtimer/audio/end.ogg", false);
 
 	// elements
 	configElement = $("#config");
@@ -247,7 +247,7 @@ function getDominantSide() {
 }
 
 // This method is part of a user-event callstack (the user clicks the "Start button")
-// We "touch" all user elements so the smartphone browser will allow manipulating them latter from background thread
+// We "touch" all user elements so the smartphone browser will allow manipulating them latter from background "thread"
 // Workaround for mobile: http://stackoverflow.com/questions/14970204/android-not-playing-html5-audio-from-an-interval
 function touchUserElements() {
     // play/pause video
@@ -258,7 +258,7 @@ function touchUserElements() {
     sounds.forEach(function(sound) {
         sound.jPlayer("play");
         sound.jPlayer("pause");
-    });
+	});
 }
 
 function createJPlayer(elementSelector, audioUrl, shouldLoop) {
