@@ -45,6 +45,7 @@
 
 		<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px"/>
 
+		<!-- Series number -->
 		<div class="configGroup" style="text-align:left; display: inline-block">
 			Number of series:
 			<br/>
@@ -54,20 +55,29 @@
 			<input type="radio" id="series5" name="seriesrb"><label class="radiolbl" for="series5">5</label>
 		</div>
 
+		<!-- Reps/sets -->
 		<div class="configGroup">
 			<input type="radio" id="reps5" name="repsrb" checked="checked"><label class="radiolbl" for="reps5">5/4</label>
 			<input type="radio" id="repsalt" name="repsrb"><label class="radiolbl" for="repsalt">Alternate</label>
 			<input type="radio" id="reps10" name="repsrb"><label class="radiolbl" for="reps10">10/2</label>
 		</div>
 
-		<div class="configGroup">
+		<!-- Swings type -->
+		<div id="swingsGroup" class="configGroup">
 			<input type="radio" id="sw2" name="swtyperb" checked="checked"><label class="radiolbl" for="sw2">Two-arm Swings</label>
 			<input type="radio" id="sw1" name="swtyperb"><label class="radiolbl" for="sw1">One-arm</label>
 		</div>
 
-		<div class="configGroup">
+		<!-- Pushups type -->
+		<div id="pushupsGroup" class="configGroup">
 			<input type="radio" id="pup" name="putyperb" checked="checked"><label class="radiolbl" for="pup">Palms Pushups</label>
 			<input type="radio" id="puf" name="putyperb"><label class="radiolbl" for="puf">Fists</label>
+		</div>
+
+		<!-- Dominant side -->
+		<div id="dominantSideGroup" class="configGroup">
+			<input type="radio" id="doml" name="dominantsiderb"><label class="radiolbl" for="doml">Left Dominant-side</label>
+			<input type="radio" id="domr" name="dominantsiderb" checked="checked"><label class="radiolbl" for="domr">Right</label>
 		</div>
 
 		<input value="Start" type="button" onClick="startStop()" style="width: 80px;"/>

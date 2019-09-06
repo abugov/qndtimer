@@ -15,6 +15,10 @@ const sw1 = "1";
 const pup = "palms";
 const puf = "fists";
 
+// Dominant side: L or R
+const domL = "L";
+const domR = "R";
+
 // ready phase duration
 const readyMilli = 5000;
 
@@ -52,11 +56,17 @@ function init() {
 	reps10Element=$("#reps10");
 	repsaltElement=$("#repsalt");
 
+	swingsGroupElement=$("#swingsGroup");
 	sw2Element=$("#sw2");
 	sw1Element=$("#sw1");
 
+	pushupsGroupElement=$("#pushupsGroup");
 	pupElement=$("#pup");
 	pufElement=$("#puf");
+
+	dominantSideGroupElement=$("#dominantSideGroup");
+	domlElement=$("#doml");
+	domrElement=$("#domr");
 	
 	elapsedElement = $("#elapsed");
 	totalTimeElement = $("#totalTime");
@@ -86,8 +96,12 @@ function init() {
 	sw1Element.click(refreshConfig);
 	pupElement.click(refreshConfig);
 	pufElement.click(refreshConfig);
+	domlElement.click(refreshConfig);
+	domrElement.click(refreshConfig);
 	
 	refreshConfig();
+
+	configElement.show( "0" );
 
 	window.addEventListener("load", function () { window.scrollTo(0, 0); });
 	document.addEventListener("touchmove", function (e) { e.preventDefault() });
@@ -133,11 +147,13 @@ function rand() {
 	// rand reps/sets
 	setRepsAndSets(rollDice());
 
-	// swing type
-	setSwingType(rollDice());
+	if (getSessionType() == session_swing) {
+		// swing type
+		setSwingType(rollDice());
 
-	// pushup type
-	setPushupType(rollDice());
+		// pushup type
+		setPushupType(rollDice());
+	}
 
 	refreshConfig();
 }
@@ -224,6 +240,12 @@ function setPushupType(dice) {
 		pufElement.prop("checked", true);
 }
 
+function getDominantSide() {
+	if (domlElement.is(':checked'))
+		return domL;
+	return domR;
+}
+
 // This method is part of a user-event callstack (the user clicks the "Start button")
 // We "touch" all user elements so the smartphone browser will allow manipulating them latter from background thread
 // Workaround for mobile: http://stackoverflow.com/questions/14970204/android-not-playing-html5-audio-from-an-interval
@@ -274,6 +296,8 @@ function loadFromStorage() {
 	loadRadio(sw1Element);
 	loadRadio(pupElement);
 	loadRadio(pufElement);
+	loadRadio(domlElement);
+	loadRadio(domrElement);
 }
 
 function saveToStorage() {
@@ -290,37 +314,53 @@ function saveToStorage() {
 	saveRadio(sw1Element);
 	saveRadio(pupElement);
 	saveRadio(pufElement);
+	saveRadio(domlElement);
+	saveRadio(domrElement);
 }
 
 function refreshConfig() {
 	saveToStorage();
 
-	session = getSessionType();
+	var isSwing = getSessionType() == session_swing;
 
-	if (session == session_snatch) {
-		alert("Snatches are not supported yet");
-		sessionSwingElement.prop('checked', true)
-		return;
+	if (isSwing) {
+		swingsGroupElement.show( "0" );
+		pushupsGroupElement.show( "0" );
+		dominantSideGroupElement.hide( "fast" );
 	}
-
-	var totalTimeMins = getSeries() * 3 /*min*/ * 2 /*swings+pushups*/;
-	setTotalTimeText(totalTimeMins + ":00");
+	else {
+		swingsGroupElement.hide( "fast" );
+		pushupsGroupElement.hide( "fast" );
+		dominantSideGroupElement.show( "0" );
+	}
 
 	setTimerText("0");
 	setCurrentSeriesText("");
 	setCurrentSetText("");
 	setNextSetText("");
 
+	var totalTimeMins = 0;
 	var series = getSeries();
 
-	trainingSession = getSwingsSeries(series);
-	trainingSession = trainingSession.concat(getPushupsSeries(series));
+	if (isSwing) {
+		totalTimeMins = series * 3 /*min*/ * 2 /*swings+pushups*/;
+		trainingSession = getSwingsSeries(series);
+		trainingSession = trainingSession.concat(getPushupsSeries(series));
+	}
+	else {
+		totalTimeMins = series * 4 /*min*/;
+		trainingSession = getSnatchesSeries(series);
+	}
 
-	debug("=== training session: ===");
+	setTotalTimeText(totalTimeMins + ":00");
 
-	for (i = 0; i < trainingSession.length; i++) {
-		set = trainingSession[i];
-		debug("series " + set.series + ": " + set.name + ", " + set.duration / 1000 + " sec");
+	if (debugMode) {
+		debug("=== training session: ===");
+
+		for (i = 0; i < trainingSession.length; i++) {
+			set = trainingSession[i];
+			debug("series " + set.series + ": " + set.name + ", " + set.duration / 1000 + " sec");
+		}
 	}
 }
 
@@ -329,7 +369,7 @@ function makeSet(name, type, series, duration) {
 }
 
 function getSwingsSeries(series) {
-	result = [];
+	var result = [];
 
 	var grip = getSwingType() == sw2 ? "Two-arm" : "One-arm";
 	var side = "R";
@@ -337,17 +377,14 @@ function getSwingsSeries(series) {
 	function getSide() {
 		if (getSwingType() == sw2)
 			side = "";
-		else if (side == "R")
-			side = "L";
 		else
-			side = "R";
+			side = side == "R" ? "L" : "R";
 
 		return side;
 	}
 
-
-	repsAndSets = getRepsAndSets();
-	curRepsAndSets = reps10_2;
+	var repsAndSets = getRepsAndSets();
+	var curRepsAndSets = reps10_2;
 
 	for (i = 0; i < series; i++) {
 		if (repsAndSets == repsAlt) {
@@ -378,12 +415,12 @@ function getSwingsSeries(series) {
 }
 
 function getPushupsSeries(series) {
-	result = [];
+	var result = [];
 
 	var grip = getPushupType() == pup ? "Palms" : "Fists";
 
-	repsAndSets = getRepsAndSets();
-	curRepsAndSets = reps10_2;
+	var repsAndSets = getRepsAndSets();
+	var curRepsAndSets = reps10_2;
 
 	for (i = 0; i < series; i++) {
 		if (repsAndSets == repsAlt) {
@@ -407,6 +444,56 @@ function getPushupsSeries(series) {
 			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
 			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
 			result.push(makeSet("Rest", "Pushups", i+1, 60000));
+		}
+	}
+
+	return result;
+}
+
+function getSnatchesSeries(series) {
+	var result = [];
+
+	var sideSwitcher = getDominantSide() == domL ? "L" : "R";
+
+	function getSide() {
+		// switch first so we start with none dominant-side
+		sideSwitcher = sideSwitcher == "R" ? "L" : "R";
+		return sideSwitcher;
+	}
+
+	var repsAndSets = getRepsAndSets();
+	var curRepsAndSets = reps10_2;
+	var side = "";
+
+	for (i = 0; i < series; i++) {
+		if (repsAndSets == repsAlt) {
+			// alternate reps and sets when back to the none dominant-side (e.g.: series 1: 5L/4, series 2: 5R/4, series 3: 10L/2, series 4: 10R/2)
+			var isNoneDominantSide = i % 2 == 0;
+			side = getSide();
+
+			if (isNoneDominantSide) {
+
+				if (curRepsAndSets == reps10_2)
+					curRepsAndSets = reps5_4;
+				else
+					curRepsAndSets = reps10_2;
+			}
+		} else {
+			side = getSide();
+			curRepsAndSets = repsAndSets;
+		}
+
+		if (curRepsAndSets == reps5_4) {
+			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
+			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
+			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
+			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
+			result.push(makeSet("Rest","Snatches", i+1, 120000));
+		}
+		else {
+			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, 60000));
+			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, 60000));
+			result.push(makeSet("Rest","Snatches", i+1, 120000));
 		}
 	}
 
@@ -470,11 +557,9 @@ function setCurrentSeriesText(text) {
 
 function startStop() {
 	if (running) {
-		$(window).unbind('beforeunload', preventReload);
 		stop(true);
 	}
     else {
-		$(window).on('beforeunload', preventReload);
 		start();
 	}
 }
@@ -485,10 +570,9 @@ function preventReload() {
 
 function start() {
 	running = true;
-	configElement.hide( "fast" );
 	runElement.show( "fast" );
-
     configInputElements.attr("disabled", true); // disable inputs
+	$(window).on('beforeunload', preventReload);
 
 	touchUserElements();
 
@@ -517,7 +601,8 @@ function stop(manualStop) {
 	running = false;
 	configElement.show( "fast" );
 	runElement.hide( "fast" );
-    getDummyVideoElement().pause();
+	$(window).unbind('beforeunload', preventReload);
+	getDummyVideoElement().pause();
 
     timers.forEach(function (timer) { clearTimeout(timer); });
     timers = [];
