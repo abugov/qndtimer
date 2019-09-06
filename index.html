@@ -35,11 +35,14 @@
 	<link rel="stylesheet" href="main.css" />
 </head>
 
-<body onload="init()" style="width: 320px;">
+<body onload="init()" style="width: 300px;">
 	<br/>
 	<div id="config" style="text-align:center">
-		<input type="radio" id="sessionSwing" name="sessionrb" checked="checked"><label class="radiolbl" for="sessionSwing">Swings & Pushups</label>
-		<input type="radio" id="sessionSnatch" name="sessionrb"><label class="radiolbl" for="sessionSnatch">Snatches</label>
+		<div class="configGroup">
+			<input type="radio" id="sessionSwing" name="sessionrb" checked="checked"><label class="radiolbl" for="sessionSwing">Swings & Pushups</label>
+			<input type="radio" id="sessionSnatch" name="sessionrb"><label class="radiolbl" for="sessionSnatch">Snatches</label>
+		</div>
+
 		<input id="rand" value="Roll Dice" type="button" onClick="rand()" style="width: 80px"/>
 
 		<div class="configGroup" style="text-align:left; display: inline-block">
@@ -73,7 +76,7 @@
 	</div>
 
 	<div id="run" style="text-align:center; display: none">
-		<input value="Stop" type="button" onClick="startStop()" style="width: 80px;"/>
+		<input value="Cancel" type="button" onClick="startStop()" style="width: 80px;"/>
 		
 		<div class="plan">
 				<label id="elapsed">00:00</label> / <label id="totalTime">00:00</label><br/>

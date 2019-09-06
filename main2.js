@@ -105,7 +105,7 @@ function init() {
 	$(window).focus(function() {
 		if (running)
         	hideKeepUnlockedMessage();
-    });
+	});
 }
 
 function version() {
@@ -470,11 +470,17 @@ function setCurrentSeriesText(text) {
 
 function startStop() {
 	if (running) {
+		$(window).unbind('beforeunload', preventReload);
 		stop(true);
 	}
     else {
+		$(window).on('beforeunload', preventReload);
 		start();
 	}
+}
+
+function preventReload() {
+	return "Reloading the page will cancel the session. Are you sure?";  
 }
 
 function start() {
