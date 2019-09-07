@@ -8,8 +8,8 @@
       "density": "1.0"
     }
   ],
-  "start_url": "index.html",
-  "display": "fullscreen",
+  "start_url_": "index.html",
+  "display": "standalone",
   "orientation": "portrait",
   "offline_enabled": true
 }
