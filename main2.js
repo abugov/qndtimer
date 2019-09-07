@@ -33,13 +33,28 @@ function init() {
 	clockTimer = null;
     sounds = [];
 	debugMode = window.location.search.indexOf('debug') > -1;
+	var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 	getDummyVideoElement().volume = 0;
 	
-	// Sounds - use http because Safari can't play from local or https
-	exclamationSound = createJPlayer("#jplayerExclamation", "http://abugov.com/qndtimer/exclamation.ogg", false);
-	chargeSound = createJPlayer("#jplayerCharge", "http://abugov.com/qndtimer/charge.ogg", false);
-	endSound = createJPlayer("#jplayerEnd", "http://abugov.com/qndtimer/end.ogg", false);
+	var soundSources = {
+		exclamation: "audio/exclamation.ogg",
+		charge: "audio/charge.ogg",
+		end: "audio/end.ogg",
+	};
+	
+
+	if (isSafari) {
+		// Safari can't play from local or https
+		soundSources["exclamation"] = "http://abugov.com/qndtimer/exclamation.ogg";
+		soundSources["charge"] = "http://abugov.com/qndtimer/charge.ogg";
+		soundSources["end"] = "http://abugov.com/qndtimer/end.ogg";
+	}
+
+	// Sounds
+	exclamationSound = createJPlayer("#jplayerExclamation", soundSources["exclamation"], false);
+	chargeSound = createJPlayer("#jplayerCharge", soundSources["charge"], false);
+	endSound = createJPlayer("#jplayerEnd", soundSources["end"], false);
 
 	// elements
 	configElement = $("#config");
