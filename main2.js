@@ -75,7 +75,6 @@ function init() {
 	timeElement = $("#time");
 	currentSetElement = $("#currentSet");
 	nextSetElement = $("#nextSet");
-	testBtnElement = $("#testBtn");
     versionElement = $("#version");
     versionTitleElement = $("#versionTitle");
 
@@ -108,10 +107,7 @@ function init() {
 	window.addEventListener("load", function () { window.scrollTo(0, 0); });
 	document.addEventListener("touchmove", function (e) { e.preventDefault() });
     
-	if (isTestMode())
-	    testBtnElement.show();
-
-		versionElement.text(version());
+	versionElement.text(version());
 
 	$(window).blur(function() {
 		if (running)
@@ -126,11 +122,21 @@ function init() {
 	versionTitleElement.mayTriggerLongClicks( { delay: 600 } )
 		.on( 'longClick', function() {
 			debugMode = true;
-			versionTitleElement.text("debug:");
+			initDebugMode();
 		} );
 
 	if (debugMode)
-		versionTitleElement.text("debug:");
+		initDebugMode();
+}
+
+function initDebugMode() {
+	var isStandalone = Boolean(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+	var standalone = isStandalone ? ", standalone" : "";
+
+	versionTitleElement.text("debug" + standalone + ":");
+
+	getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
+	getDummyVideoElement()[0].load();
 }
 
 function version() {
@@ -284,10 +290,6 @@ function createJPlayer(elementSelector, audioUrl, shouldLoop) {
 
     sounds.push(sound);
     return sound;
-}
-
-function isTestMode() {
-    return window.location.search.indexOf('test') > -1;
 }
 
 // Use a function instead of storing the selector at "init" (I think that if you do that, then you can't 'play' the video from js on some smartphones)
@@ -513,11 +515,6 @@ function getSnatchesSeries(series) {
 	return result;
 }
 
-function test() {
-	exclamationSound.jPlayer("stop");
-    exclamationSound.jPlayer("play");
-}
-
 function playSetEnding() {
 	chargeSound.jPlayer("stop");
     chargeSound.jPlayer("play");
@@ -587,11 +584,6 @@ function start() {
 	runElement.show( "fast" );
     configInputElements.attr("disabled", true); // disable inputs
 	$(window).on('beforeunload', preventReload);
-
-	if (debugMode) {
-		getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
-		getDummyVideoElement()[0].load();
-	}
 	
 	touchUserElements();
 
