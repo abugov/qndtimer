@@ -6,6 +6,12 @@
 <script type="text/javascript">
 //<![CDATA[
 
+function play() {
+	setTimeout(function() {
+		$("#play").click();
+	}, 1000);
+}
+
 $(document).ready(function(){
 
 	// Local copy of jQuery selectors, for performance.
@@ -40,10 +46,11 @@ $(document).ready(function(){
 
 		<div id="jquery_jplayer"></div>
 
+		<label onclick="play();">my play</label>
 		
 		<div id="jp_container">
 			<ul>
-				<li><a class="jp-play" href="#">Play</a></li>
+				<li><a id="play" class="jp-play" href="#">Play</a></li>
 				<li><a class="jp-pause" href="#">Pause</a></li>
 				<li><a class="jp-stop" href="#">Stop</a></li>
 				<li><a class="jp-mute" href="#">Mute</a></li>

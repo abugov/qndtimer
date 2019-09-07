@@ -43,7 +43,6 @@ function init() {
 		end: "audio/end.ogg",
 	};
 	
-
 	if (isSafari) {
 		// Safari can't play from local or https
 		soundSources["exclamation"] = "http://abugov.com/qndtimer/exclamation.ogg";
