@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8" />
-<!-- Website Design By: www.happyworm.com -->
-<title>Demo : jPlayer as a text based audio player</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <script type="text/javascript" src="jquery.min.js"></script>
 <script type="text/javascript" src="jplayer/jquery.jplayer.min.js"></script>
 <script type="text/javascript">
@@ -15,12 +11,6 @@ $(document).ready(function(){
 	// Local copy of jQuery selectors, for performance.
 	var	my_jPlayer = $("#jquery_jplayer");
 
-	// Some options
-	var	opt_play_first = false, // If true, will attempt to auto-play the default track on page loads. No effect on mobile devices, like iOS.
-		opt_auto_play = true, // If true, when a track is selected, it will auto-play.
-		opt_text_playing = "Now playing", // Text when playing
-		opt_text_selected = "Track selected"; // Text when not playing
-
 	// Instance jPlayer
 	my_jPlayer.jPlayer({
 		ready: function () {
@@ -28,17 +18,12 @@ $(document).ready(function(){
 		swfPath: "js",
 		cssSelectorAncestor: "#jp_container",
 		supplied: "mp3",
-		wmode: "window"
 	});
 
-	// Create click handlers for the different tracks
-	$("#lala").click(function(e) {
 		my_jPlayer.jPlayer("setMedia", {
 			//mp3: "https://abugov.github.io/qndtimer/audio/charge.ogg"
 			mp3: "http://www.jplayer.org/audio/mp3/TSP-01-Cro_magnon_man.mp3"
 		});
-		return false;
-	});
 
 });
 //]]>
@@ -54,36 +39,13 @@ $(document).ready(function(){
 
 		<div id="jquery_jplayer"></div>
 
-
-
-
-		<label id="lala">lala1</label>
-
-
-
-
 		
-		<!-- Using the cssSelectorAncestor option with the default cssSelector class names to enable control association of standard functions using built in features -->
-
-		<div id="jp_container" class="demo-container">
-			<p>
-				<span class="play-state"></span> :
-				<span class="track-name">nothing</span>
-				at <span class="extra-play-info"></span>
-				of <span class="jp-duration"></span>, which is
-				<span class="jp-current-time"></span>
-			</p>
+		<div id="jp_container">
 			<ul>
 				<li><a class="jp-play" href="#">Play</a></li>
 				<li><a class="jp-pause" href="#">Pause</a></li>
 				<li><a class="jp-stop" href="#">Stop</a></li>
-			</ul>
-			<ul>
-				<li>volume :</li>
 				<li><a class="jp-mute" href="#">Mute</a></li>
-				<li><a class="jp-unmute" href="#">Unmute</a></li>
-				<li> <a class="jp-volume-bar" href="#">|&lt;----------&gt;|</a></li>
-				<li><a class="jp-volume-max" href="#">Max</a></li>
 			</ul>
 		</div>
 

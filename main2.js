@@ -37,7 +37,7 @@ function init() {
 	getDummyVideoElement().volume = 0;
 	
     // Sounds
-	exclamationSound = createJPlayer("#jplayerExclamation", "http://www.jplayer.org/audio/mp3/TSP-01-Cro_magnon_man.mp3", false);
+	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
 	chargeSound = createJPlayer("#jplayerCharge", "audio/charge.ogg", false);
 	endSound = createJPlayer("#jplayerEnd", "audio/end.ogg", false);
 
