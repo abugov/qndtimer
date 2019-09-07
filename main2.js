@@ -139,6 +139,10 @@ function version() {
 	minor = d.getUTCMonth() + 1;
 	build = d.getUTCDate();
 	rev = d.getUTCHours() * 100 + d.getUTCMinutes();
+
+	if (rev < 1000)
+		rev = "0" + rev
+
 	return major + "." + minor + "." + build + "." + rev;
 }
 
@@ -593,25 +597,11 @@ function start() {
 	
 	touchUserElements();
 
-	// prevent screen lock
-	getDummyVideoElement()[0].pause();
-	getDummyVideoElement()[0].play();
-
 	updateEndTimes(new Date(new Date().getTime() + readyMilli))
 	
 	var sessionStartTime = new Date(new Date().getTime() + readyMilli);
 
     mySetTimeout(function () { startSet(-1, sessionStartTime); }, 0);
-}
-
-function updateEndTimes(startTime) {
-	endTime = startTime;
-	for (i = 0; i < trainingSession.length; i++) {
-		set = trainingSession[i];
-		endTime = new Date(endTime.getTime() + set.duration);
-		set.endTime = endTime;
-		debug(set.name + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
-	}
 }
 
 function stop(manualStop) {
@@ -692,6 +682,10 @@ function startSet(index, sessionStartTime) {
 }
 
 function refreshClock(sessionStartTime, setEndTime) {
+	// prevent screen lock. we do this on high interval in case the video stopped (e.g. user clicks "pause" button in app sound indication on smartphone)
+	getDummyVideoElement()[0].pause();
+	getDummyVideoElement()[0].play();
+
 	var timeLeft = setEndTime.getTime() - new Date();
 	setTimerText(Math.ceil(timeLeft / 1000));
 
@@ -710,6 +704,16 @@ function refreshClock(sessionStartTime, setEndTime) {
     clockTimer = mySetTimeout(function () {
         refreshClock(sessionStartTime, setEndTime);
     }, 1000);
+}
+
+function updateEndTimes(startTime) {
+	endTime = startTime;
+	for (i = 0; i < trainingSession.length; i++) {
+		set = trainingSession[i];
+		endTime = new Date(endTime.getTime() + set.duration);
+		set.endTime = endTime;
+		debug(set.name + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
+	}
 }
 
 function pad(number) {

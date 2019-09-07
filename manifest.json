@@ -8,8 +8,8 @@
       "density": "1.0"
     }
   ],
-  "start_url": "index.html",
-  "display": "fullscreen",
+  "start_url --> disabled so we can 'Save to Home Screen' with query parameter '?debug'": "index.html",
+  "display": "standalone",
   "orientation": "portrait",
   "offline_enabled": true
 }
