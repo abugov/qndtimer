@@ -35,11 +35,6 @@ function init() {
 	debugMode = window.location.search.indexOf('debug') > -1;
 
 	getDummyVideoElement().volume = 0;
-
-	if (debugMode) {
-		getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
-		getDummyVideoElement()[0].load();
-	}
 	
     // Sounds
 	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
@@ -49,6 +44,7 @@ function init() {
 	// elements
 	configElement = $("#config");
 	runElement = $("#run");
+
 	sessionSwingElement=$("#sessionSwing");
 	sessionSnatchElement=$("#sessionSnatch");
 
@@ -80,7 +76,8 @@ function init() {
 	currentSetElement = $("#currentSet");
 	nextSetElement = $("#nextSet");
 	testBtnElement = $("#testBtn");
-    documentVersionElement = $("#documentVersion");
+    versionElement = $("#version");
+    versionTitleElement = $("#versionTitle");
 
 	timerElement=$("#timer");
 	keepUnlockedMessageElement=$("#keepUnlockedMessage");
@@ -114,7 +111,7 @@ function init() {
 	if (isTestMode())
 	    testBtnElement.show();
 
-	documentVersionElement.text(version());
+		versionElement.text(version());
 
 	$(window).blur(function() {
 		if (running)
@@ -125,6 +122,15 @@ function init() {
 		if (running)
         	hideKeepUnlockedMessage();
 	});
+
+	versionTitleElement.mayTriggerLongClicks( { delay: 600 } )
+		.on( 'longClick', function() {
+			debugMode = true;
+			versionTitleElement.text("debug:");
+		} );
+
+	if (debugMode)
+		versionTitleElement.text("debug:");
 }
 
 function version() {
@@ -580,6 +586,11 @@ function start() {
     configInputElements.attr("disabled", true); // disable inputs
 	$(window).on('beforeunload', preventReload);
 
+	if (debugMode) {
+		getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
+		getDummyVideoElement()[0].load();
+	}
+	
 	touchUserElements();
 
 	// prevent screen lock
