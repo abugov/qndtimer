@@ -139,6 +139,10 @@ function version() {
 	minor = d.getUTCMonth() + 1;
 	build = d.getUTCDate();
 	rev = d.getUTCHours() * 100 + d.getUTCMinutes();
+
+	if (rev < 1000)
+		rev = "0" + rev
+
 	return major + "." + minor + "." + build + "." + rev;
 }
 
