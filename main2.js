@@ -134,22 +134,20 @@ function init() {
 }
 
 function version() {
-	d = new Date(document.lastModified);
-	major = d.getUTCFullYear() - 2019;
-	minor = d.getUTCMonth() + 1;
-	build = d.getUTCDate();
-	rev = d.getUTCHours() * 100 + d.getUTCMinutes();
-
-	if (rev < 1000)
-		rev = "0" + rev
+	var d = new Date(document.lastModified);
+	var major = d.getUTCFullYear() - 2019;
+	var minor = d.getUTCMonth() + 1;
+	var build = d.getUTCDate();
+	var rev = d.getUTCHours() * 100 + d.getUTCMinutes();
+	rev = rev < 1000 ? "0" + String(rev) : rev;
 
 	return major + "." + minor + "." + build + "." + rev;
 }
 
 function rand() {
 	// rand series
-	dice = rollDice();
-	series = diceToSeries(dice);
+	var dice = rollDice();
+	var series = diceToSeries(dice);
 
 	// "if you rolled the same rep count as the last session, roll again"
 	while (series == getSeries()) {
@@ -707,7 +705,7 @@ function refreshClock(sessionStartTime, setEndTime) {
 }
 
 function updateEndTimes(startTime) {
-	endTime = startTime;
+	var endTime = startTime;
 	for (i = 0; i < trainingSession.length; i++) {
 		set = trainingSession[i];
 		endTime = new Date(endTime.getTime() + set.duration);
@@ -721,7 +719,7 @@ function pad(number) {
 }
 
 function rollDice() {
-	dice = Math.floor((Math.random() * 6) + 1);
+	var dice = Math.floor((Math.random() * 6) + 1);
 	return dice
 }
 
