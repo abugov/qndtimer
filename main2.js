@@ -139,9 +139,9 @@ function version() {
 	var minor = d.getUTCMonth() + 1;
 	var build = d.getUTCDate();
 	var rev = d.getUTCHours() * 100 + d.getUTCMinutes();
-	var revStr = rev < 1000 ? "0" + rev : rev;
+	rev = rev < 1000 ? "0" + String(rev) : rev;
 
-	return major + "." + minor + "." + build + "." + revStr;
+	return major + "." + minor + "." + build + "." + rev;
 }
 
 function rand() {
