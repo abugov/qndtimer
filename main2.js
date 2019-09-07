@@ -36,10 +36,10 @@ function init() {
 
 	getDummyVideoElement().volume = 0;
 	
-    // Sounds
-	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
-	chargeSound = createJPlayer("#jplayerCharge", "audio/charge.ogg", false);
-	endSound = createJPlayer("#jplayerEnd", "audio/end.ogg", false);
+	// Sounds - use http because Safari can't play from local or https
+	exclamationSound = createJPlayer("#jplayerExclamation", "http://abugov.com/qndtimer/exclamation.ogg", false);
+	chargeSound = createJPlayer("#jplayerCharge", "http://abugov.com/qndtimer/charge.ogg", false);
+	endSound = createJPlayer("#jplayerEnd", "http://abugov.com/qndtimer/end.ogg", false);
 
 	// elements
 	configElement = $("#config");
@@ -134,6 +134,7 @@ function initDebugMode() {
 	var standalone = isStandalone ? ", standalone" : "";
 
 	versionTitleElement.text("debug" + standalone + ":");
+	debug("debug mode." + standalone);
 
 	getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
 	getDummyVideoElement()[0].load();
