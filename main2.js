@@ -19,11 +19,13 @@ const puf = "fists";
 const domL = "L";
 const domR = "R";
 
-// ready phase duration
-const readyMilli = 5000;
+// Used to display "rest" and to identify the rest set in code
+const rest = "Rest";
 
-// 3s before the end of the set a sound will be played
-const setEndingDuration = 3000;
+// durations
+const readyMilli = 5000; // ready phase duration
+const setAboutToEndDuration = 5000; // 5s before the end of the set the "tick tock" sound will be played
+const setEndingDuration = 3000; // 3s before the end of the set the "charge" sound will be played
 
 function init() {
 	// global vars
@@ -33,13 +35,30 @@ function init() {
 	clockTimer = null;
     sounds = [];
 	debugMode = window.location.search.indexOf('debug') > -1;
+	var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 	getDummyVideoElement().volume = 0;
 	
-    // Sounds
-	exclamationSound = createJPlayer("#jplayerExclamation", "audio/exclamation.ogg", false);
-	chargeSound = createJPlayer("#jplayerCharge", "audio/charge.ogg", false);
-	endSound = createJPlayer("#jplayerEnd", "audio/end.ogg", false);
+	var soundSources = {
+		exclamation: "audio/exclamation.ogg",
+		charge: "audio/charge.ogg",
+		ticktock: "audio/ticktock.ogg",
+		end: "audio/end.ogg",
+	};
+	
+	if (isSafari) {
+		// Safari can't play from local or https
+		soundSources["exclamation"] = "http://abugov.com/qndtimer/audio/exclamation.ogg";
+		soundSources["charge"] = "http://abugov.com/qndtimer/audio/charge.ogg";
+		soundSources["ticktock"] = "http://abugov.com/qndtimer/audio/ticktock.ogg";
+		soundSources["end"] = "http://abugov.com/qndtimer/audio/end.ogg";
+	}
+
+	// Sounds
+	exclamationSound = createJPlayer("#jplayerExclamation", soundSources["exclamation"], false);
+	chargeSound = createJPlayer("#jplayerCharge", soundSources["charge"], false);
+	ticktockSound = createJPlayer("#jplayerTickTock", soundSources["ticktock"], false);
+	endSound = createJPlayer("#jplayerEnd", soundSources["end"], false);
 
 	// elements
 	configElement = $("#config");
@@ -75,7 +94,6 @@ function init() {
 	timeElement = $("#time");
 	currentSetElement = $("#currentSet");
 	nextSetElement = $("#nextSet");
-	testBtnElement = $("#testBtn");
     versionElement = $("#version");
     versionTitleElement = $("#versionTitle");
 
@@ -108,10 +126,7 @@ function init() {
 	window.addEventListener("load", function () { window.scrollTo(0, 0); });
 	document.addEventListener("touchmove", function (e) { e.preventDefault() });
     
-	if (isTestMode())
-	    testBtnElement.show();
-
-		versionElement.text(version());
+	versionElement.text(version());
 
 	$(window).blur(function() {
 		if (running)
@@ -126,11 +141,22 @@ function init() {
 	versionTitleElement.mayTriggerLongClicks( { delay: 600 } )
 		.on( 'longClick', function() {
 			debugMode = true;
-			versionTitleElement.text("debug:");
+			initDebugMode();
 		} );
 
 	if (debugMode)
-		versionTitleElement.text("debug:");
+		initDebugMode();
+}
+
+function initDebugMode() {
+	var isStandalone = Boolean(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+	var standalone = isStandalone ? ", standalone" : "";
+
+	versionTitleElement.text("debug" + standalone + ":");
+	debug("debug mode." + standalone);
+
+	getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
+	getDummyVideoElement()[0].load();
 }
 
 function version() {
@@ -286,10 +312,6 @@ function createJPlayer(elementSelector, audioUrl, shouldLoop) {
     return sound;
 }
 
-function isTestMode() {
-    return window.location.search.indexOf('test') > -1;
-}
-
 // Use a function instead of storing the selector at "init" (I think that if you do that, then you can't 'play' the video from js on some smartphones)
 function getDummyVideoElement() {
 	return $("#dummyVideo");
@@ -415,12 +437,12 @@ function getSwingsSeries(series) {
 			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
 			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
 			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet("Rest","Swings", i+1, 60000));
+			result.push(makeSet(rest,"Swings", i+1, 60000));
 		}
 		else {
 			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
 			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
-			result.push(makeSet("Rest","Swings", i+1, 60000));
+			result.push(makeSet(rest,"Swings", i+1, 60000));
 		}
 	}
 
@@ -451,12 +473,12 @@ function getPushupsSeries(series) {
 			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
 			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
 			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet("Rest", "Pushups", i+1, 60000));
+			result.push(makeSet(rest, "Pushups", i+1, 60000));
 		}
 		else {
 			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
 			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
-			result.push(makeSet("Rest", "Pushups", i+1, 60000));
+			result.push(makeSet(rest, "Pushups", i+1, 60000));
 		}
 	}
 
@@ -501,21 +523,21 @@ function getSnatchesSeries(series) {
 			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
 			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
 			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
-			result.push(makeSet("Rest","Snatches", i+1, 120000));
+			result.push(makeSet(rest,"Snatches", i+1, 120000));
 		}
 		else {
 			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, 60000));
 			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, 60000));
-			result.push(makeSet("Rest","Snatches", i+1, 120000));
+			result.push(makeSet(rest,"Snatches", i+1, 120000));
 		}
 	}
 
 	return result;
 }
 
-function test() {
-	exclamationSound.jPlayer("stop");
-    exclamationSound.jPlayer("play");
+function playSetAboutToEndSound() {
+	ticktockSound.jPlayer("stop");
+    ticktockSound.jPlayer("play");
 }
 
 function playSetEnding() {
@@ -587,11 +609,6 @@ function start() {
 	runElement.show( "fast" );
     configInputElements.attr("disabled", true); // disable inputs
 	$(window).on('beforeunload', preventReload);
-
-	if (debugMode) {
-		getDummyVideoElement().attr('src', "video/DebugMovie.mp4");
-		getDummyVideoElement()[0].load();
-	}
 	
 	touchUserElements();
 
@@ -664,13 +681,19 @@ function startSet(index, sessionStartTime) {
 		setTimerText(Math.ceil(duration / 1000))
 		
 		// play a sound towards the end of the set, except on the last set (the session end sound will be played)
-		if (!lastSet)
-			mySetTimeout(function(){ playSetEnding(); }, duration - setEndingDuration);
+		if (!lastSet) {
+			var nextSetIsRest = trainingSession[index+1].name == rest;
+
+			if (!nextSetIsRest) {
+				mySetTimeout(function(){ playSetEnding(); }, duration - setEndingDuration);
+				mySetTimeout(function(){ playSetAboutToEndSound(); }, duration - setAboutToEndDuration);
+			}
+		}
 		
 		clockTimer = mySetTimeout(function () { refreshClock(sessionStartTime, setEndTime); }, 0);
 	}
 
-	// Start the next interval or stop if time ended
+	// Start the next set or stop if time ended
 	mySetTimeout(function(){
 		if (lastSet)
 	        stop(false);
