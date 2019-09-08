@@ -35,24 +35,16 @@ function init() {
 	clockTimer = null;
     sounds = [];
 	debugMode = window.location.search.indexOf('debug') > -1;
-	var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+	//var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 	getDummyVideoElement().volume = 0;
 	
 	var soundSources = {
-		exclamation: "audio/exclamation.ogg",
-		charge: "audio/charge.ogg",
-		ticktock: "audio/ticktock.ogg",
-		end: "audio/end.ogg",
+		exclamation: "audio/exclamation.mp3",
+		charge: "audio/charge.mp3",
+		ticktock: "audio/ticktock.mp3",
+		end: "audio/end.mp3",
 	};
-	
-	if (isSafari) {
-		// Safari can't play from local or https
-		soundSources["exclamation"] = "http://abugov.com/qndtimer/audio/exclamation.ogg";
-		soundSources["charge"] = "http://abugov.com/qndtimer/audio/charge.ogg";
-		soundSources["ticktock"] = "http://abugov.com/qndtimer/audio/ticktock.ogg";
-		soundSources["end"] = "http://abugov.com/qndtimer/audio/end.ogg";
-	}
 
 	// Sounds
 	exclamationSound = createJPlayer("#jplayerExclamation", soundSources["exclamation"], false);
