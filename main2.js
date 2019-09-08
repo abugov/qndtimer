@@ -48,10 +48,10 @@ function init() {
 	
 	if (isSafari) {
 		// Safari can't play from local or https
-		soundSources["exclamation"] = "http://abugov.com/qndtimer/exclamation.ogg";
-		soundSources["charge"] = "http://abugov.com/qndtimer/charge.ogg";
-		soundSources["ticktock"] = "http://abugov.com/qndtimer/ticktock.ogg";
-		soundSources["end"] = "http://abugov.com/qndtimer/end.ogg";
+		soundSources["exclamation"] = "http://abugov.com/qndtimer/audio/exclamation.ogg";
+		soundSources["charge"] = "http://abugov.com/qndtimer/audio/charge.ogg";
+		soundSources["ticktock"] = "http://abugov.com/qndtimer/audio/ticktock.ogg";
+		soundSources["end"] = "http://abugov.com/qndtimer/audio/end.ogg";
 	}
 
 	// Sounds
