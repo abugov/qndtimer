@@ -6,9 +6,12 @@
 <script type="text/javascript">
 //<![CDATA[
 
+p = null;
+
 function play() {
+
 	setTimeout(function() {
-		$("#play").click();
+		p.click();
 	}, 1000);
 }
 
@@ -29,24 +32,20 @@ $(document).ready(function(){
 		my_jPlayer.jPlayer("setMedia", {
 			// Safari can't play from local or https
 			//mp3: "https://abugov.github.io/qndtimer/audio/charge.ogg"
-			mp3: "http://abugov.com/qndtimer/charge.ogg"
+//			mp3: "http://abugov.com/qndtimer/charge.ogg"
+mp3: "http://www.jplayer.org/audio/ogg/Miaow-07-Bubble.ogg"
 		});
 
 });
 //]]>
 </script>
 
-<style>
-
--->
-</style>
-
 </head>
 <body>
 
 		<div id="jquery_jplayer"></div>
 
-		<label onclick="play();">my play</label>
+		<label onclick="p = $('#play'); play();">my play</label>
 		
 		<div id="jp_container">
 			<ul>
