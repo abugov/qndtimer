@@ -44,7 +44,8 @@ function init() {
 		charge: "audio/charge.mp3",
 		ticktock: "audio/ticktock.mp3",
 		end: "audio/end.mp3",
-		race: "audio/race.mp3"
+		race: "audio/race.mp3",
+		dice: "audio/dice.mp3"
 	};
 
 	// Sounds
@@ -53,6 +54,7 @@ function init() {
 	ticktockSound = createJPlayer("#jplayerTickTock", soundSources["ticktock"], false);
 	endSound = createJPlayer("#jplayerEnd", soundSources["end"], false);
 	raceSound = createJPlayer("#jplayerRace", soundSources["race"], false);
+	diceSound = createJPlayer("#jplayerDice", soundSources["dice"], false);
 
 	// elements
 	configElement = $("#config");
@@ -174,6 +176,8 @@ function version() {
 }
 
 function rand() {
+	playDiceSound();
+
 	// rand series
 	var dice = rollDice();
 	var series = diceToSeries(dice);
@@ -546,6 +550,11 @@ function getSnatchesSeries(series) {
 	}
 
 	return result;
+}
+
+function playDiceSound() {
+	diceSound.jPlayer("stop");
+    diceSound.jPlayer("play");
 }
 
 function playSetAboutToEndSound() {
