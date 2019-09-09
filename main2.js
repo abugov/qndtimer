@@ -44,6 +44,7 @@ function init() {
 		charge: "audio/charge.mp3",
 		ticktock: "audio/ticktock.mp3",
 		end: "audio/end.mp3",
+		_321go: "audio/321go.mp3"
 	};
 
 	// Sounds
@@ -51,6 +52,7 @@ function init() {
 	chargeSound = createJPlayer("#jplayerCharge", soundSources["charge"], false);
 	ticktockSound = createJPlayer("#jplayerTickTock", soundSources["ticktock"], false);
 	endSound = createJPlayer("#jplayerEnd", soundSources["end"], false);
+	_321goSound = createJPlayer("#jplayer321go", soundSources["_321go"], false);
 
 	// elements
 	configElement = $("#config");
@@ -533,8 +535,10 @@ function playSetAboutToEndSound() {
 }
 
 function playSetEnding() {
-	chargeSound.jPlayer("stop");
-    chargeSound.jPlayer("play");
+	//chargeSound.jPlayer("stop");
+	//chargeSound.jPlayer("play");
+	_321goSound.jPlayer("stop");
+    _321goSound.jPlayer("play");
 }
 
 function playSessionEnded() {
