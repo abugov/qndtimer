@@ -44,7 +44,7 @@ function init() {
 		charge: "audio/charge.mp3",
 		ticktock: "audio/ticktock.mp3",
 		end: "audio/end.mp3",
-		_321go: "audio/321go.mp3"
+		race: "audio/race.mp3"
 	};
 
 	// Sounds
@@ -52,10 +52,11 @@ function init() {
 	chargeSound = createJPlayer("#jplayerCharge", soundSources["charge"], false);
 	ticktockSound = createJPlayer("#jplayerTickTock", soundSources["ticktock"], false);
 	endSound = createJPlayer("#jplayerEnd", soundSources["end"], false);
-	_321goSound = createJPlayer("#jplayer321go", soundSources["_321go"], false);
+	raceSound = createJPlayer("#jplayerRace", soundSources["race"], false);
 
 	// elements
 	configElement = $("#config");
+	cogElement = $("#cog");
 	runElement = $("#run");
 
 	sessionSwingElement=$("#sessionSwing");
@@ -95,6 +96,10 @@ function init() {
 	keepUnlockedMessageElement=$("#keepUnlockedMessage");
 	configInputElements = $("#config :input");
 
+	cogEndSoundChargeElement=$("#endSoundCharge");
+	cogEndSoundRaceElement=$("#endSoundRace");
+	cogEndSoundNoneElement=$("#endSoundNone");
+
 	loadFromStorage();
 
 	sessionSwingElement.click(refreshConfig);
@@ -114,6 +119,10 @@ function init() {
 	domrElement.click(refreshConfig);
 	
 	refreshConfig();
+
+	cogEndSoundChargeElement.click(refreshCogEndSound);
+	cogEndSoundRaceElement.click(refreshCogEndSound);
+	cogEndSoundNoneElement.click(refreshCogEndSound);
 
 	configElement.show( "0" );
 
@@ -327,6 +336,9 @@ function loadFromStorage() {
 	loadRadio(pufElement);
 	loadRadio(domlElement);
 	loadRadio(domrElement);
+	loadRadio(cogEndSoundChargeElement);
+	loadRadio(cogEndSoundRaceElement);
+	loadRadio(cogEndSoundNoneElement);
 }
 
 function saveToStorage() {
@@ -345,6 +357,9 @@ function saveToStorage() {
 	saveRadio(pufElement);
 	saveRadio(domlElement);
 	saveRadio(domrElement);
+	saveRadio(cogEndSoundChargeElement);
+	saveRadio(cogEndSoundRaceElement);
+	saveRadio(cogEndSoundNoneElement);
 }
 
 function refreshConfig() {
@@ -393,6 +408,10 @@ function refreshConfig() {
 	}
 }
 
+function refreshCogEndSound() {
+	saveToStorage();
+	playSetEnding();
+}
 function makeSet(name, type, series, duration) {
 	return { name: name, type: type, series: series, duration: duration, endTime: new Date()}
 }
@@ -535,10 +554,14 @@ function playSetAboutToEndSound() {
 }
 
 function playSetEnding() {
-	//chargeSound.jPlayer("stop");
-	//chargeSound.jPlayer("play");
-	_321goSound.jPlayer("stop");
-    _321goSound.jPlayer("play");
+	chargeSound.jPlayer("stop");
+	raceSound.jPlayer("stop");
+	
+	if (cogEndSoundChargeElement.is(':checked')) {
+		chargeSound.jPlayer("play");
+	} else if (cogEndSoundRaceElement.is(':checked')) {
+		raceSound.jPlayer("play");
+	}
 }
 
 function playSessionEnded() {
@@ -584,6 +607,16 @@ function setTotalTimeText(text) {
 
 function setCurrentSeriesText(text) {
 	currentSeriesElement.text(text)
+}
+
+function openCog() {
+	configElement.hide( "fast" );
+	cogElement.show( "fast" );
+}
+
+function closeCog() {
+	cogElement.hide( "fast" );
+	configElement.show( "fast" );
 }
 
 function startStop() {
