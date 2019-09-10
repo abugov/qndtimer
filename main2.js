@@ -24,7 +24,7 @@ const rest = "Rest";
 
 // durations
 const readyMilli = 5000; // ready phase duration
-const setAboutToEndDuration = 5000; // 5s before the end of the set the "tick tock" sound will be played
+const setAboutToEndDuration = 10000; // 10s before the end of the set the "tick tock" sound will be played
 const setEndingDuration = 3000; // 3s before the end of the set the "charge" sound will be played
 
 function init() {
@@ -682,10 +682,11 @@ function startSet(index, sessionStartTime) {
 	if (clockTimer != null)
 		clearTimeout(clockTimer);
 	
+	var ready = index == -1;
 	var lastSet = index == trainingSession.length - 1;
 	var setEndTime = null;
 
-	if (index == -1) {
+	if (ready) {
 		//duration = readyMilli;
 		setEndTime = sessionStartTime;
 		setCurrentSetText("Ready ...");
@@ -724,7 +725,9 @@ function startSet(index, sessionStartTime) {
 
 			if (!nextSetIsRest) {
 				mySetTimeout(function(){ playSetEnding(); }, duration - setEndingDuration);
-				mySetTimeout(function(){ playSetAboutToEndSound(); }, duration - setAboutToEndDuration);
+
+				if (!ready)
+					mySetTimeout(function(){ playSetAboutToEndSound(); }, duration - setAboutToEndDuration);
 			}
 		}
 		
