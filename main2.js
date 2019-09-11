@@ -734,6 +734,12 @@ function startSet(index, sessionStartTime) {
 		clockTimer = mySetTimeout(function () { refreshClock(sessionStartTime, setEndTime); }, 0);
 	}
 
+	currentSetElement.addClass("blink");
+
+	mySetTimeout(function(){
+		currentSetElement.removeClass("blink");
+	}, 1500);
+
 	// Start the next set or stop if time ended
 	mySetTimeout(function(){
 		if (lastSet)
