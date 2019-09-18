@@ -451,23 +451,29 @@ function getSwingsAndPushupsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
+			// swings series
 			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
 			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
 			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
 			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
 			result.push(makeSet(rest, "Swings", i+1, 60000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
+
+			// pushups series
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
 			result.push(makeSet(rest, "Pushups", i+1, 60000));
 		}
 		else {
+			//swings series
 			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
 			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
 			result.push(makeSet(rest, "Swings", i+1, 60000));
-			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+1, 60000));
-			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+1, 60000));
+
+			// pushups series
+			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+2, 60000));
+			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+2, 60000));
 			result.push(makeSet(rest, "Pushups", i+1, 60000));
 		}
 	}
@@ -663,7 +669,7 @@ function startSet(index, sessionStartTime) {
 		//duration = readyMilli;
 		setEndTime = sessionStartTime;
 		setCurrentSetText("Ready ...");
-		setCurrentSeriesText(trainingSession[0].type + " series " + trainingSession[0].series + " / " + getSeries());
+		setCurrentSeriesText("Series " + trainingSession[0].series + " / " + getSeries());
 		setNextSetText(trainingSession[0].name);
 	} 
 	else {
@@ -673,7 +679,7 @@ function startSet(index, sessionStartTime) {
 		setEndTime = set.endTime;
 		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.duration + " sec");
 
-		setCurrentSeriesText(set.type + " series " + set.series + " / " + getSeries());
+		setCurrentSeriesText("Series " + set.series + " / " + getSeries());
 		setCurrentSetText(set.name);
 
 		if (index == trainingSession.length - 1)
