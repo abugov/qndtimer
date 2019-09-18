@@ -452,29 +452,29 @@ function getSwingsAndPushupsSeries(series) {
 
 		if (curRepsAndSets == reps5_4) {
 			// swings series
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(rest, "Swings", i+1, 60000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i*2+1, 30000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i*2+1, 30000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i*2+1, 30000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i*2+1, 30000));
+			result.push(makeSet(rest, "Swings", i*2+1, 60000));
 
 			// pushups series
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+2, 30000));
-			result.push(makeSet(rest, "Pushups", i+1, 60000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i*2+2, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i*2+2, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i*2+2, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i*2+2, 30000));
+			result.push(makeSet(rest, "Pushups", i*2+2, 60000));
 		}
 		else {
 			//swings series
-			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
-			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
-			result.push(makeSet(rest, "Swings", i+1, 60000));
+			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i*2+1, 60000));
+			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i*2+1, 60000));
+			result.push(makeSet(rest, "Swings", i*2+1, 60000));
 
 			// pushups series
-			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+2, 60000));
-			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+2, 60000));
-			result.push(makeSet(rest, "Pushups", i+1, 60000));
+			result.push(makeSet(puType + " Pushups: 10", "Pushups", i*2+2, 60000));
+			result.push(makeSet(puType + " Pushups: 10", "Pushups", i*2+2, 60000));
+			result.push(makeSet(rest, "Pushups", i*2+2, 60000));
 		}
 	}
 
