@@ -392,8 +392,7 @@ function refreshConfig() {
 
 	if (isSwing) {
 		totalTimeMins = series * 3 /*min*/ * 2 /*swings+pushups*/;
-		trainingSession = getSwingsSeries(series);
-		trainingSession = trainingSession.concat(getPushupsSeries(series));
+		trainingSession = getSwingsAndPushupsSeries(series);
 	}
 	else {
 		totalTimeMins = series * 4 /*min*/;
@@ -420,12 +419,14 @@ function makeSet(name, type, series, duration) {
 	return { name: name, type: type, series: series, duration: duration, endTime: new Date()}
 }
 
-function getSwingsSeries(series) {
+function getSwingsAndPushupsSeries(series) {
 	var result = [];
 
-	var grip = getSwingType() == sw2 ? "Two-arm" : "One-arm";
+	var swGrip = getSwingType() == sw2 ? "Two-arm" : "One-arm";
+	var puType = getPushupType() == pup ? "Palms" : "Fists";
 	var side = "R";
 
+	// one-arm swings: switch arms from set to set
 	function getSide() {
 		if (getSwingType() == sw2)
 			side = "";
@@ -450,51 +451,23 @@ function getSwingsSeries(series) {
 		}
 
 		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(rest,"Swings", i+1, 60000));
-		}
-		else {
-			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
-			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
-			result.push(makeSet(rest,"Swings", i+1, 60000));
-		}
-	}
-
-	return result;
-}
-
-function getPushupsSeries(series) {
-	var result = [];
-
-	var grip = getPushupType() == pup ? "Palms" : "Fists";
-
-	var repsAndSets = getRepsAndSets();
-	var curRepsAndSets = reps10_2;
-
-	for (i = 0; i < series; i++) {
-		if (repsAndSets == repsAlt) {
-			// alternate reps and sets
-			if (curRepsAndSets == reps10_2)
-				curRepsAndSets = reps5_4;
-			else
-				curRepsAndSets = reps10_2;
-		} else {
-			curRepsAndSets = repsAndSets;
-		}
-
-		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
+			result.push(makeSet(rest, "Swings", i+1, 60000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
+			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, 30000));
 			result.push(makeSet(rest, "Pushups", i+1, 60000));
 		}
 		else {
-			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
-			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
+			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
+			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
+			result.push(makeSet(rest, "Swings", i+1, 60000));
+			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+1, 60000));
+			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+1, 60000));
 			result.push(makeSet(rest, "Pushups", i+1, 60000));
 		}
 	}
