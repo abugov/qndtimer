@@ -91,8 +91,10 @@ function init() {
 	totalTimeElement = $("#totalTime");
 	currentSeriesElement = $("#currentSeries");
 	timeElement = $("#time");
-	currentSetElement = $("#currentSet");
-	nextSetElement = $("#nextSet");
+	currentSetLbl1Element = $("#currentSetLbl1");
+	currentSetLbl2Element = $("#currentSetLbl2");
+	nextSetLbl1Element = $("#nextSetLbl1");
+	nextSetLbl2Element = $("#nextSetLbl2");
     versionElement = $("#version");
     versionTitleElement = $("#versionTitle");
 
@@ -384,8 +386,8 @@ function refreshConfig() {
 
 	setTimerText("0");
 	setCurrentSeriesText("");
-	setCurrentSetText("");
-	setNextSetText("");
+	setCurrentSetText("", "");
+	setNextSetText("", "");
 
 	var totalTimeMins = 0;
 	var series = getSeries();
@@ -406,7 +408,7 @@ function refreshConfig() {
 
 		for (i = 0; i < trainingSession.length; i++) {
 			set = trainingSession[i];
-			debug("series " + set.series + ": " + set.name + ", is alternate: " + set.isAlt + ", " + set.duration / 1000 + " sec");
+			debug("series " + set.series + ": " + set.reps + " " + set.name + ", is alternate: " + set.isAlt + ", " + set.duration / 1000 + " sec");
 		}
 	}
 }
@@ -415,8 +417,8 @@ function refreshCogEndSound() {
 	saveToStorage();
 	playSetEnding();
 }
-function makeSet(name, type, series, isAlt, duration) {
-	return { name: name, type: type, series: series, duration: duration, isAlt: isAlt, endTime: new Date()}
+function makeSet(name, reps, type, series, isAlt, duration) {
+	return { name: name, reps: reps, type: type, series: series, duration: duration, isAlt: isAlt, endTime: new Date()}
 }
 
 function getSwingsAndPushupsSeries(series) {
@@ -454,29 +456,29 @@ function getSwingsAndPushupsSeries(series) {
 
 		if (curRepsAndSets == reps5_4) {
 			// swings series
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, isAlt, 30000));
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, isAlt, 30000));
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, isAlt, 30000));
-			result.push(makeSet(swGrip + " Swings: 5" + getSide(),"Swings", i+1, isAlt, 30000));
-			result.push(makeSet(rest, "Swings", i+1, false, 60000));
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, isAlt, 30000));
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
+			result.push(makeSet(rest, "0", "Swings", i+1, false, 60000));
 
 			// pushups series
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, false, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, false, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, false, 30000));
-			result.push(makeSet(puType + " Pushups: 5", "Pushups", i+1, false, 30000));
-			result.push(makeSet(rest, "Pushups", i+1, false, 60000));
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(rest, "0", "Pushups", i+1, false, 60000));
 		}
 		else {
 			//swings series
-			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, isAlt, 60000));
-			result.push(makeSet(swGrip + " Swings: 10" + getSide(),"Swings", i+1, isAlt, 60000));
-			result.push(makeSet(rest, "Swings", i+1, false, 60000));
+			result.push(makeSet(swGrip + " Swings:", "10" + getSide(),"Swings", i+1, isAlt, 60000));
+			result.push(makeSet(swGrip + " Swings:", "10" + getSide(),"Swings", i+1, false, 60000));
+			result.push(makeSet(rest, "0", "Swings", i+1, false, 60000));
 
 			// pushups series
-			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+1, false, 60000));
-			result.push(makeSet(puType + " Pushups: 10", "Pushups", i+1, false, 60000));
-			result.push(makeSet(rest, "Pushups", i+1, false, 60000));
+			result.push(makeSet(puType + " Pushups:", "10", "Pushups", i+1, false, 60000));
+			result.push(makeSet(puType + " Pushups:", "10", "Pushups", i+1, false, 60000));
+			result.push(makeSet(rest, "0", "Pushups", i+1, false, 60000));
 		}
 	}
 
@@ -518,16 +520,16 @@ function getSnatchesSeries(series) {
 		var isAlt = i > 0 && repsAndSets == repsAlt;
 
 		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet(rest,"Snatches", i+1, false, 120000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
+			result.push(makeSet(rest, "0", "Snatches", i+1, false, 120000));
 		}
 		else {
-			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, isAlt, 60000));
-			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, isAlt, 60000));
-			result.push(makeSet(rest,"Snatches", i+1, false, 120000));
+			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, isAlt, 60000));
+			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, isAlt, 60000));
+			result.push(makeSet(rest, "0", "Snatches", i+1, false, 120000));
 		}
 	}
 
@@ -589,12 +591,14 @@ function setElapsedText(text) {
 	elapsedElement.text(text)
 }
 
-function setCurrentSetText(text) {
-	currentSetElement.text(text)
+function setCurrentSetText(lbl1, lbl2) {
+	currentSetLbl1Element.text(lbl1)
+	currentSetLbl2Element.text(lbl2)
 }
 
-function setNextSetText(text) {
-	nextSetElement.text(text)
+function setNextSetText(lbl1, lbl2) {
+	nextSetLbl1Element.text(lbl1)
+	nextSetLbl2Element.text(lbl2)
 }
 
 function setTotalTimeText(text) {
@@ -676,24 +680,24 @@ function startSet(index, sessionStartTime) {
 	if (ready) {
 		//duration = readyMilli;
 		setEndTime = sessionStartTime;
-		setCurrentSetText("Ready ...");
+		setCurrentSetText("Ready ...", "");
 		setCurrentSeriesText("Series " + trainingSession[0].series + " / " + getSeries());
-		setNextSetText(trainingSession[0].name);
+		setNextSetText(trainingSession[0].name, trainingSession[0].reps);
 	} 
 	else {
 		var set = trainingSession[index];
 
 		//duration = set.duration;
 		setEndTime = set.endTime;
-		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.duration + " sec");
+		debug("started set #" + index + ": series " + set.series + ", " + set.reps + " " + set.name + ", " + set.duration + " sec");
 
 		setCurrentSeriesText("Series " + set.series + " / " + getSeries());
-		setCurrentSetText(set.name);
+		setCurrentSetText(set.name, set.reps);
 
 		if (index == trainingSession.length - 1)
-			setNextSetText("Done!");
+			setNextSetText("Done!", "");
 		else
-			setNextSetText(trainingSession[index+1].name);	
+			setNextSetText(trainingSession[index+1].name, trainingSession[index+1].reps);
 	}
 	
 	// calc duration using the set end time that was planned instead of simply using the set duration, this is to fix time shifting due to js engine being stopped when the web browser is losing focus
@@ -714,30 +718,31 @@ function startSet(index, sessionStartTime) {
 			if (!nextSetIsRest) {
 				mySetTimeout(function(){ playSetEnding(); }, duration - setEndingDuration);
 
-				if (!ready) {
-					if (nextSetIsAlt) {
-						mySetTimeout(function() {
-							playNotifyAlternateSound();
-							nextSetElement.addClass("blink");
+				if (!ready)
+					mySetTimeout(function(){ playSetAboutToEndSound(); }, duration - setAboutToEndDuration);
+			}
 
-							mySetTimeout(function(){
-								nextSetElement.removeClass("blink");
-							}, 4000);
-						}, duration - setAboutToEndDuration);
-					}
-					else
-						mySetTimeout(function(){ playSetAboutToEndSound(); }, duration - setAboutToEndDuration);
-				}
+			if (nextSetIsAlt) {
+				mySetTimeout(function() {
+					playNotifyAlternateSound();
+					nextSetLbl2Element.addClass("blink");
+
+					mySetTimeout(function(){
+						nextSetLbl2Element.removeClass("blink");
+					}, 7000);
+				}, duration - setAboutToEndDuration);
 			}
 		}
 		
 		clockTimer = mySetTimeout(function () { refreshClock(sessionStartTime, setEndTime); }, 0);
 	}
 
-	currentSetElement.addClass("blink");
+	currentSetLbl1Element.addClass("blink");
+	currentSetLbl2Element.addClass("blink");
 	
 	mySetTimeout(function(){
-		currentSetElement.removeClass("blink");
+		currentSetLbl1Element.removeClass("blink");
+		currentSetLbl2Element.removeClass("blink");
 	}, 1500);
 
 	// Start the next set or stop if time ended
@@ -780,7 +785,7 @@ function updateEndTimes(startTime) {
 		set = trainingSession[i];
 		endTime = new Date(endTime.getTime() + set.duration);
 		set.endTime = endTime;
-		debug(set.name + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
+		debug(set.name + ": " + set.reps + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
 	}
 }
 
