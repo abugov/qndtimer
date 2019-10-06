@@ -460,25 +460,25 @@ function getSwingsAndPushupsSeries(series) {
 			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
 			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
 			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
-			result.push(makeSet(rest, "0", "Swings", i+1, false, 60000));
+			result.push(makeSet(rest, "", "Swings", i+1, false, 60000));
 
 			// pushups series
 			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
 			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
 			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
 			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
-			result.push(makeSet(rest, "0", "Pushups", i+1, false, 60000));
+			result.push(makeSet(rest, "", "Pushups", i+1, false, 60000));
 		}
 		else {
 			//swings series
 			result.push(makeSet(swGrip + " Swings:", "10" + getSide(),"Swings", i+1, isAlt, 60000));
 			result.push(makeSet(swGrip + " Swings:", "10" + getSide(),"Swings", i+1, false, 60000));
-			result.push(makeSet(rest, "0", "Swings", i+1, false, 60000));
+			result.push(makeSet(rest, "", "Swings", i+1, false, 60000));
 
 			// pushups series
 			result.push(makeSet(puType + " Pushups:", "10", "Pushups", i+1, false, 60000));
 			result.push(makeSet(puType + " Pushups:", "10", "Pushups", i+1, false, 60000));
-			result.push(makeSet(rest, "0", "Pushups", i+1, false, 60000));
+			result.push(makeSet(rest, "", "Pushups", i+1, false, 60000));
 		}
 	}
 
@@ -524,12 +524,12 @@ function getSnatchesSeries(series) {
 			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
 			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
 			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet(rest, "0", "Snatches", i+1, false, 120000));
+			result.push(makeSet(rest, "", "Snatches", i+1, false, 120000));
 		}
 		else {
 			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, isAlt, 60000));
 			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, isAlt, 60000));
-			result.push(makeSet(rest, "0", "Snatches", i+1, false, 120000));
+			result.push(makeSet(rest, "", "Snatches", i+1, false, 120000));
 		}
 	}
 
