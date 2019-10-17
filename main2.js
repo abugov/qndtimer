@@ -521,14 +521,14 @@ function getSnatchesSeries(series) {
 
 		if (curRepsAndSets == reps5_4) {
 			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
-			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, false, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, false, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, false, 30000));
 			result.push(makeSet(rest, "", "Snatches", i+1, false, 120000));
 		}
 		else {
 			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, isAlt, 60000));
-			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, isAlt, 60000));
+			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, false, 60000));
 			result.push(makeSet(rest, "", "Snatches", i+1, false, 120000));
 		}
 	}
