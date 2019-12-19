@@ -62,6 +62,7 @@ function init() {
 	configElement = $("#config");
 	cogElement = $("#cog");
 	runElement = $("#run");
+	finishModalElement = $("#finishModal");
 
 	sessionSwingElement=$("#sessionSwing");
 	sessionSnatchElement=$("#sessionSnatch");
@@ -125,6 +126,18 @@ function init() {
 	domrElement.click(refreshConfig);
 	
 	refreshConfig();
+
+	// When the user clicks on X, close the finish modal
+	$(".closeModal").click(function() {
+		finishModalElement.hide();
+	})
+
+	// When the user clicks anywhere outside of the finish modal, close it
+	$(window).click(function(event) {
+		if (event.target.id == finishModalElement[0].id) {
+			finishModalElement.hide();
+		}
+	})
 
 	cogEndSoundChargeElement.click(refreshCogEndSound);
 	cogEndSoundRaceElement.click(refreshCogEndSound);
@@ -662,11 +675,13 @@ function stop(manualStop) {
 	
 	if (!manualStop)
 		playSessionEnded();
-
+	
 	configInputElements.attr("disabled", false);
 
 	// reset run elements
 	refreshConfig();
+
+	//finishModalElement.show();
 }
 
 function startSet(index, sessionStartTime) {
