@@ -194,7 +194,7 @@ input[type="radio"]:checked + .radiolbl:before {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
-  padding-top: 70px; /* Location of the box */
+  padding-top: 60px; /* Location of the box */
   padding-left: 20px;
   left: 0;
   top: 0;
@@ -235,7 +235,7 @@ input[type="radio"]:checked + .radiolbl:before {
 
 .modal-footer {
   padding: 10px 16px;
-  text-align: left;
+  text-align: center;
   color: black;
 }
 
