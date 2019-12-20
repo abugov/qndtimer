@@ -194,7 +194,8 @@ input[type="radio"]:checked + .radiolbl:before {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  padding-top: 70px; /* Location of the box */
+  padding-left: 20px;
   left: 0;
   top: 0;
   width: 100%; /* Full width */
@@ -206,17 +207,36 @@ input[type="radio"]:checked + .radiolbl:before {
 
 /* Modal Content */
 .modal-content {
-  position: relative;
+  position: fixed; /* Stay in place */
   background-color: #fefefe;
   margin: auto;
   padding: 0;
   border: 1px solid #888;
-  width: 80%;
+  width: 260px;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
   animation-name: animatetop;
   animation-duration: 0.4s
+}
+
+.modal-header {
+  padding: 2px 16px;
+  text-align: center;
+  background-color: #5cb85c;
+  color: white;
+}
+
+.modal-body {
+  padding: 10px 16px;
+  text-align: center;
+  color: black;
+}
+
+.modal-footer {
+  padding: 10px 16px;
+  text-align: left;
+  color: black;
 }
 
 /* Modal Animation */
@@ -243,11 +263,3 @@ input[type="radio"]:checked + .radiolbl:before {
   text-decoration: none;
   cursor: pointer;
 }
-
-.modal-header {
-  padding: 2px 16px;
-  background-color: #5cb85c;
-  color: white;
-}
-
-.modal-body {padding: 2px 16px;}

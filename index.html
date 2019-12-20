@@ -89,7 +89,7 @@
 		</div>
 
 		<br/>
-		<button type="button" onClick="startStop()" class="btn btn-default btn-sm">Start</button>
+		<button type="button" onClick="startStop()" class="btn btn-default btn-sm" style="width:130px">Start</button>
 		<br/>
 		<br/>
 
@@ -124,14 +124,14 @@
 				<label id="currentSeries">Swings series 1/2</label><br/>
 			<label class="big">
 				<label id="timer" class="timer">0</label><label class="timerSeconds">s</label><br/>
-				<label id="currentSetLbl1" class="now">Swings</label>&nbsp;<label id="currentSetLbl2" class="now">5L</label></br>
+				<label id="currentSetLbl1" class="now">Swings</label>&nbsp;<label id="currentSetLbl2" class="now">5L</label><br/>
 				Next:<br/>
 				<label id="nextSetLbl1">Swings</label>&nbsp;<label id="nextSetLbl2">10</label><br/>
 			</label>
 		</div>
 
 		<br/>
-		<button type="button" onClick="startStop()" class="btn btn-default btn-sm">Cancel</button>
+		<button type="button" onClick="startStop()" class="btn btn-default btn-sm" style="width:130px">Cancel</button>
 
 		<br/>
 		<div id="keepUnlockedMessage" style="display: none">
@@ -156,17 +156,23 @@
 		<div class="modal-content">
 			<div class="modal-header">
 			<span class="closeModal">&times;</span>
-			<h2>Modal Header</h2>
+			<h2>Done</h2>
 			</div>
 			<div class="modal-body">
-			<p>Some text in the Modal Body</p>
-			<div>
-				<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-					<input type="hidden" name="cmd" value="_s-xclick" />
-					<input type="hidden" name="hosted_button_id" value="G28SNACKFUUN4" />
-					<input type="image" src="1-2-paypal-donate-button-png-thumb.png" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-				</form>
-			</div>	
+				<p>I hope you had a good practice!</p>
+				<p>I'd really appreciate your support in the development and maintenance of this app.</p>
+				<div>
+					<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+						<input type="hidden" name="cmd" value="_s-xclick" />
+						<input type="hidden" name="hosted_button_id" value="G28SNACKFUUN4" />
+						<input type="image" src="img/support.jpeg" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+					</form>
+				</div>
+			</div>
+			<div class=modal-footer>
+				Thank you,
+				<br/>
+				<a href="https://www.strongfirst.com/instructors/israel/alex-abugov.001370000076Tf1AAE/" target="_blank">Alex Abugov, SFG II</a>
 			</div>
 		</div>
 	</div>
