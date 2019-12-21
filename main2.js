@@ -681,7 +681,8 @@ function stop(manualStop) {
 	// reset run elements
 	refreshConfig();
 
-	finishModalElement.show();
+	if (!manualStop)
+		finishModalElement.show();
 }
 
 function startSet(index, sessionStartTime) {
