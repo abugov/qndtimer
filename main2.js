@@ -24,7 +24,7 @@ const rest = "Rest";
 
 // durations
 const readyMilli = 5000; // ready phase duration
-const setAboutToEndDuration = 5000; // 5s before the end of the set the "tick tock" sound will be played
+const setAboutToEndDuration = 10000; // 10s before the end of the set the "tick tock" sound will be played
 const setEndingDuration = 3000; // 3s before the end of the set the "charge" sound will be played
 
 function init() {
@@ -43,18 +43,26 @@ function init() {
 		exclamation: "audio/exclamation.mp3",
 		charge: "audio/charge.mp3",
 		ticktock: "audio/ticktock.mp3",
+		alternate: "audio/alternate.mp3",
 		end: "audio/end.mp3",
+		race: "audio/race.mp3",
+		dice: "audio/dice.mp3"
 	};
 
 	// Sounds
 	exclamationSound = createJPlayer("#jplayerExclamation", soundSources["exclamation"], false);
 	chargeSound = createJPlayer("#jplayerCharge", soundSources["charge"], false);
 	ticktockSound = createJPlayer("#jplayerTickTock", soundSources["ticktock"], false);
+	alternateSound = createJPlayer("#jplayerAlternate", soundSources["alternate"], false);
 	endSound = createJPlayer("#jplayerEnd", soundSources["end"], false);
+	raceSound = createJPlayer("#jplayerRace", soundSources["race"], false);
+	diceSound = createJPlayer("#jplayerDice", soundSources["dice"], false);
 
 	// elements
 	configElement = $("#config");
+	cogElement = $("#cog");
 	runElement = $("#run");
+	finishModalElement = $("#finishModal");
 
 	sessionSwingElement=$("#sessionSwing");
 	sessionSnatchElement=$("#sessionSnatch");
@@ -84,14 +92,20 @@ function init() {
 	totalTimeElement = $("#totalTime");
 	currentSeriesElement = $("#currentSeries");
 	timeElement = $("#time");
-	currentSetElement = $("#currentSet");
-	nextSetElement = $("#nextSet");
+	currentSetLbl1Element = $("#currentSetLbl1");
+	currentSetLbl2Element = $("#currentSetLbl2");
+	nextSetLbl1Element = $("#nextSetLbl1");
+	nextSetLbl2Element = $("#nextSetLbl2");
     versionElement = $("#version");
     versionTitleElement = $("#versionTitle");
 
 	timerElement=$("#timer");
 	keepUnlockedMessageElement=$("#keepUnlockedMessage");
 	configInputElements = $("#config :input");
+
+	cogEndSoundChargeElement=$("#endSoundCharge");
+	cogEndSoundRaceElement=$("#endSoundRace");
+	cogEndSoundNoneElement=$("#endSoundNone");
 
 	loadFromStorage();
 
@@ -112,6 +126,22 @@ function init() {
 	domrElement.click(refreshConfig);
 	
 	refreshConfig();
+
+	// When the user clicks on X, close the finish modal
+	$(".closeModal").click(function() {
+		finishModalElement.hide();
+	})
+
+	// When the user clicks anywhere outside of the finish modal, close it
+	$(window).click(function(event) {
+		if (event.target.id == finishModalElement[0].id) {
+			finishModalElement.hide();
+		}
+	})
+
+	cogEndSoundChargeElement.click(refreshCogEndSound);
+	cogEndSoundRaceElement.click(refreshCogEndSound);
+	cogEndSoundNoneElement.click(refreshCogEndSound);
 
 	configElement.show( "0" );
 
@@ -163,6 +193,8 @@ function version() {
 }
 
 function rand() {
+	playDiceSound();
+
 	// rand series
 	var dice = rollDice();
 	var series = diceToSeries(dice);
@@ -202,8 +234,6 @@ function diceToSeries(dice) {
 function getSeries() {
 	if (series2Element.is(':checked'))
 		return 2;
-	if (series3Element.is(':checked'))
-		return 3;
 	if (series3Element.is(':checked'))
 		return 3;
 	if (series4Element.is(':checked'))
@@ -325,6 +355,9 @@ function loadFromStorage() {
 	loadRadio(pufElement);
 	loadRadio(domlElement);
 	loadRadio(domrElement);
+	loadRadio(cogEndSoundChargeElement);
+	loadRadio(cogEndSoundRaceElement);
+	loadRadio(cogEndSoundNoneElement);
 }
 
 function saveToStorage() {
@@ -343,6 +376,9 @@ function saveToStorage() {
 	saveRadio(pufElement);
 	saveRadio(domlElement);
 	saveRadio(domrElement);
+	saveRadio(cogEndSoundChargeElement);
+	saveRadio(cogEndSoundRaceElement);
+	saveRadio(cogEndSoundNoneElement);
 }
 
 function refreshConfig() {
@@ -363,16 +399,15 @@ function refreshConfig() {
 
 	setTimerText("0");
 	setCurrentSeriesText("");
-	setCurrentSetText("");
-	setNextSetText("");
+	setCurrentSetText("", "");
+	setNextSetText("", "");
 
 	var totalTimeMins = 0;
 	var series = getSeries();
 
 	if (isSwing) {
 		totalTimeMins = series * 3 /*min*/ * 2 /*swings+pushups*/;
-		trainingSession = getSwingsSeries(series);
-		trainingSession = trainingSession.concat(getPushupsSeries(series));
+		trainingSession = getSwingsAndPushupsSeries(series);
 	}
 	else {
 		totalTimeMins = series * 4 /*min*/;
@@ -386,21 +421,27 @@ function refreshConfig() {
 
 		for (i = 0; i < trainingSession.length; i++) {
 			set = trainingSession[i];
-			debug("series " + set.series + ": " + set.name + ", " + set.duration / 1000 + " sec");
+			debug("series " + set.series + ": " + set.reps + " " + set.name + ", is alternate: " + set.isAlt + ", " + set.duration / 1000 + " sec");
 		}
 	}
 }
 
-function makeSet(name, type, series, duration) {
-	return { name: name, type: type, series: series, duration: duration, endTime: new Date()}
+function refreshCogEndSound() {
+	saveToStorage();
+	playSetEnding();
+}
+function makeSet(name, reps, type, series, isAlt, duration) {
+	return { name: name, reps: reps, type: type, series: series, duration: duration, isAlt: isAlt, endTime: new Date()}
 }
 
-function getSwingsSeries(series) {
+function getSwingsAndPushupsSeries(series) {
 	var result = [];
 
-	var grip = getSwingType() == sw2 ? "Two-arm" : "One-arm";
+	var swGrip = getSwingType() == sw2 ? "Two-arm" : "One-arm";
+	var puType = getPushupType() == pup ? "Palms" : "Fists";
 	var side = "R";
 
+	// one-arm swings: switch arms from set to set
 	function getSide() {
 		if (getSwingType() == sw2)
 			side = "";
@@ -424,53 +465,33 @@ function getSwingsSeries(series) {
 			curRepsAndSets = repsAndSets;
 		}
 
-		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(grip + " Swings: 5" + getSide(),"Swings", i+1, 30000));
-			result.push(makeSet(rest,"Swings", i+1, 60000));
-		}
-		else {
-			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
-			result.push(makeSet(grip + " Swings: 10" + getSide(),"Swings", i+1, 60000));
-			result.push(makeSet(rest,"Swings", i+1, 60000));
-		}
-	}
-
-	return result;
-}
-
-function getPushupsSeries(series) {
-	var result = [];
-
-	var grip = getPushupType() == pup ? "Palms" : "Fists";
-
-	var repsAndSets = getRepsAndSets();
-	var curRepsAndSets = reps10_2;
-
-	for (i = 0; i < series; i++) {
-		if (repsAndSets == repsAlt) {
-			// alternate reps and sets
-			if (curRepsAndSets == reps10_2)
-				curRepsAndSets = reps5_4;
-			else
-				curRepsAndSets = reps10_2;
-		} else {
-			curRepsAndSets = repsAndSets;
-		}
+		var isAlt = i > 0 && repsAndSets == repsAlt;
 
 		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(grip + " Pushups: 5", "Pushups", i+1, 30000));
-			result.push(makeSet(rest, "Pushups", i+1, 60000));
+			// swings series
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, isAlt, 30000));
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
+			result.push(makeSet(swGrip + " Swings:", "5" + getSide(),"Swings", i+1, false, 30000));
+			result.push(makeSet(rest, "", "Swings", i+1, false, 60000));
+
+			// pushups series
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(puType + " Pushups:", "5", "Pushups", i+1, false, 30000));
+			result.push(makeSet(rest, "", "Pushups", i+1, false, 60000));
 		}
 		else {
-			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
-			result.push(makeSet(grip + " Pushups: 10", "Pushups", i+1, 60000));
-			result.push(makeSet(rest, "Pushups", i+1, 60000));
+			//swings series
+			result.push(makeSet(swGrip + " Swings:", "10" + getSide(),"Swings", i+1, isAlt, 60000));
+			result.push(makeSet(swGrip + " Swings:", "10" + getSide(),"Swings", i+1, false, 60000));
+			result.push(makeSet(rest, "", "Swings", i+1, false, 60000));
+
+			// pushups series
+			result.push(makeSet(puType + " Pushups:", "10", "Pushups", i+1, false, 60000));
+			result.push(makeSet(puType + " Pushups:", "10", "Pushups", i+1, false, 60000));
+			result.push(makeSet(rest, "", "Pushups", i+1, false, 60000));
 		}
 	}
 
@@ -493,38 +514,44 @@ function getSnatchesSeries(series) {
 	var side = "";
 
 	for (i = 0; i < series; i++) {
+		side = getSide();
+
 		if (repsAndSets == repsAlt) {
 			// alternate reps and sets when back to the none dominant-side (e.g.: series 1: 5L/4, series 2: 5R/4, series 3: 10L/2, series 4: 10R/2)
 			var isNoneDominantSide = i % 2 == 0;
-			side = getSide();
 
 			if (isNoneDominantSide) {
-
 				if (curRepsAndSets == reps10_2)
 					curRepsAndSets = reps5_4;
 				else
 					curRepsAndSets = reps10_2;
 			}
 		} else {
-			side = getSide();
 			curRepsAndSets = repsAndSets;
 		}
 
+		var isAlt = i > 0 && repsAndSets == repsAlt;
+
 		if (curRepsAndSets == reps5_4) {
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
-			result.push(makeSet("Snatches: 5" + side,"Snatches", i+1, 30000));
-			result.push(makeSet(rest,"Snatches", i+1, 120000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, isAlt, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, false, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, false, 30000));
+			result.push(makeSet("Snatches:", "5" + side,"Snatches", i+1, false, 30000));
+			result.push(makeSet(rest, "", "Snatches", i+1, false, 120000));
 		}
 		else {
-			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, 60000));
-			result.push(makeSet("Snatches: 10" + side,"Snatches", i+1, 60000));
-			result.push(makeSet(rest,"Snatches", i+1, 120000));
+			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, isAlt, 60000));
+			result.push(makeSet("Snatches:", "10" + side,"Snatches", i+1, false, 60000));
+			result.push(makeSet(rest, "", "Snatches", i+1, false, 120000));
 		}
 	}
 
 	return result;
+}
+
+function playDiceSound() {
+	diceSound.jPlayer("stop");
+    diceSound.jPlayer("play");
 }
 
 function playSetAboutToEndSound() {
@@ -532,9 +559,20 @@ function playSetAboutToEndSound() {
     ticktockSound.jPlayer("play");
 }
 
+function playNotifyAlternateSound() {
+	alternateSound.jPlayer("stop");
+    alternateSound.jPlayer("play");
+}
+
 function playSetEnding() {
 	chargeSound.jPlayer("stop");
-    chargeSound.jPlayer("play");
+	raceSound.jPlayer("stop");
+	
+	if (cogEndSoundChargeElement.is(':checked')) {
+		chargeSound.jPlayer("play");
+	} else if (cogEndSoundRaceElement.is(':checked')) {
+		raceSound.jPlayer("play");
+	}
 }
 
 function playSessionEnded() {
@@ -566,12 +604,14 @@ function setElapsedText(text) {
 	elapsedElement.text(text)
 }
 
-function setCurrentSetText(text) {
-	currentSetElement.text(text)
+function setCurrentSetText(lbl1, lbl2) {
+	currentSetLbl1Element.text(lbl1)
+	currentSetLbl2Element.text(lbl2)
 }
 
-function setNextSetText(text) {
-	nextSetElement.text(text)
+function setNextSetText(lbl1, lbl2) {
+	nextSetLbl1Element.text(lbl1)
+	nextSetLbl2Element.text(lbl2)
 }
 
 function setTotalTimeText(text) {
@@ -580,6 +620,16 @@ function setTotalTimeText(text) {
 
 function setCurrentSeriesText(text) {
 	currentSeriesElement.text(text)
+}
+
+function openCog() {
+	configElement.hide( "fast" );
+	cogElement.show( "fast" );
+}
+
+function closeCog() {
+	cogElement.hide( "fast" );
+	configElement.show( "fast" );
 }
 
 function startStop() {
@@ -625,41 +675,45 @@ function stop(manualStop) {
 	
 	if (!manualStop)
 		playSessionEnded();
-
+	
 	configInputElements.attr("disabled", false);
 
 	// reset run elements
 	refreshConfig();
+
+	if (!manualStop)
+		finishModalElement.show();
 }
 
 function startSet(index, sessionStartTime) {
 	if (clockTimer != null)
 		clearTimeout(clockTimer);
 	
+	var ready = index == -1;
 	var lastSet = index == trainingSession.length - 1;
 	var setEndTime = null;
 
-	if (index == -1) {
+	if (ready) {
 		//duration = readyMilli;
 		setEndTime = sessionStartTime;
-		setCurrentSetText("Ready ...");
-		setCurrentSeriesText(trainingSession[0].type + " series " + trainingSession[0].series + " / " + getSeries());
-		setNextSetText(trainingSession[0].name);
+		setCurrentSetText("Ready ...", "");
+		setCurrentSeriesText("Series " + trainingSession[0].series + " / " + getSeries());
+		setNextSetText(trainingSession[0].name, trainingSession[0].reps);
 	} 
 	else {
 		var set = trainingSession[index];
 
 		//duration = set.duration;
 		setEndTime = set.endTime;
-		debug("started set #" + index + ": series " + set.series + ", " + set.name + ", " + set.duration + " sec");
+		debug("started set #" + index + ": series " + set.series + ", " + set.reps + " " + set.name + ", " + set.duration + " sec");
 
-		setCurrentSeriesText(set.type + " series " + set.series + " / " + getSeries());
-		setCurrentSetText(set.name);
+		setCurrentSeriesText("Series " + set.series + " / " + getSeries());
+		setCurrentSetText(set.name, set.reps);
 
 		if (index == trainingSession.length - 1)
-			setNextSetText("Done!");
+			setNextSetText("Done!", "");
 		else
-			setNextSetText(trainingSession[index+1].name);	
+			setNextSetText(trainingSession[index+1].name, trainingSession[index+1].reps);
 	}
 	
 	// calc duration using the set end time that was planned instead of simply using the set duration, this is to fix time shifting due to js engine being stopped when the web browser is losing focus
@@ -675,15 +729,37 @@ function startSet(index, sessionStartTime) {
 		// play a sound towards the end of the set, except on the last set (the session end sound will be played)
 		if (!lastSet) {
 			var nextSetIsRest = trainingSession[index+1].name == rest;
+			var nextSetIsAlt = trainingSession[index+1].isAlt;
 
 			if (!nextSetIsRest) {
 				mySetTimeout(function(){ playSetEnding(); }, duration - setEndingDuration);
-				mySetTimeout(function(){ playSetAboutToEndSound(); }, duration - setAboutToEndDuration);
+
+				if (!ready)
+					mySetTimeout(function(){ playSetAboutToEndSound(); }, duration - setAboutToEndDuration);
+			}
+
+			if (nextSetIsAlt) {
+				mySetTimeout(function() {
+					playNotifyAlternateSound();
+					nextSetLbl2Element.addClass("blink");
+
+					mySetTimeout(function(){
+						nextSetLbl2Element.removeClass("blink");
+					}, 7000);
+				}, duration - setAboutToEndDuration);
 			}
 		}
 		
 		clockTimer = mySetTimeout(function () { refreshClock(sessionStartTime, setEndTime); }, 0);
 	}
+
+	currentSetLbl1Element.addClass("blink");
+	currentSetLbl2Element.addClass("blink");
+	
+	mySetTimeout(function(){
+		currentSetLbl1Element.removeClass("blink");
+		currentSetLbl2Element.removeClass("blink");
+	}, 1500);
 
 	// Start the next set or stop if time ended
 	mySetTimeout(function(){
@@ -725,7 +801,7 @@ function updateEndTimes(startTime) {
 		set = trainingSession[i];
 		endTime = new Date(endTime.getTime() + set.duration);
 		set.endTime = endTime;
-		debug(set.name + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
+		debug(set.name + ": " + set.reps + ", " + pad(set.endTime.getHours()) + ":" + pad(set.endTime.getMinutes()) + ":" + pad(set.endTime.getSeconds()));
 	}
 }
 
